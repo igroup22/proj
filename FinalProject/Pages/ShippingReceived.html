@@ -37,7 +37,7 @@
             });
 
             $("#newBTN").on("click", function () {
-                car = null;
+
                 mode = "new";
                 $("#pForm").hide();
                 $("#shippingCertificate").val(localStorage["ShippingCertificate"]);
@@ -56,7 +56,7 @@
             // once the document is ready we fetch a list of Material from the server
             ajaxCall("GET", "../api/ShippingReceived", "", succGet, errGet)
 
-            $("#MaterialForm").submit(onSubmitFunc); // wire the submit event to a function called f1
+            $("#MaterialForm").submit(onSubmitFunc); 
 
             $("#editDiv").hide();
             $("#saveBTN").on("click", function () {
@@ -65,10 +65,10 @@
         });
 
         function Inventoryfun() {
-             let rolenum = localStorage["RoleNum"];
+            let rolenum = localStorage["RoleNum"];
             if (rolenum == 10)
                 document.getElementById("menuPage").innerHTML = "<a href='Menu - manager.html'>לתפריט</a>";
-            else   document.getElementById("menuPage").innerHTML = "<a href='Menu.html'>לתפריט</a>";
+            else document.getElementById("menuPage").innerHTML = "<a href='Menu.html'>לתפריט</a>";
 
             ajaxCall("GET", "../api/Inventory", "", InvySuccess, error);
         }
@@ -149,7 +149,7 @@
                 $("#editDiv :input").attr("disabled", "disabled"); // view mode: disable all controls in the form
                 populateFields(this.getAttribute('material-Id'));
             });
-  
+
         }
         function populateFields(idMarerial) {
             material1 = getMaterial(idMarerial);
@@ -183,7 +183,6 @@
 
         function onSubmitFunc() {
 
-
             let materialtoSave1 = {
 
                 NumMaterial: $("#numMaterial").val(),
@@ -198,7 +197,33 @@
 
                 var r = confirm("כמות ההזמנה לא שווה לכמות בפועל");
                 if (r == true) {
-                    console.log("true")
+                    console.log("true");
+                //    var nodemailer = ('nodemailer');
+
+                //    var transporter = nodemailer.createTransport({
+                //        service: 'gmail',
+                //        auth: {
+                //            user: 'nogahirschmann@gmail.com',
+                //            pass: 'noga1210'
+                //        }
+                //    });
+
+                //    var mailOptions = {
+                //        from: 'nogahirschmann@gmail.com',
+                //        to: 'nogaspamnoga@gmail.com',
+                //        subject: 'Sending Email using Node.js',
+                //        text: 'לא הגיע מספיק מחומר'
+                //    };
+
+                //    transporter.sendMail(mailOptions, function (error, info) {
+                //        if (error) {
+                //            console.log(error);
+                //        } else {
+                //            console.log('Email sent: ' + info.response);
+                //        }
+                //    });
+
+
                 }
                 else {
                     console.log("false")
@@ -264,7 +289,7 @@
 
         }
 
-   
+
 
         // redraw a datatable with new data
         function redrawTable(tbl, data) {
@@ -279,7 +304,7 @@
         function error(err) {
             swal("Error: " + err);
         }
-    
+
     </script>
 </head>
 

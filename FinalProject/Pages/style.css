@@ -30,6 +30,26 @@ select {
     border: 1px solid black;
     border-radius: 4px;
 }
+#menuPage1 a {
+    direction: rtl;
+    color: #5e5e5e;
+    text-align: center;
+    padding: 11px 11px;
+    border: 1px solid #5e5e5e;
+    border-radius: 4px;
+    border: 1px solid #5e5e5e;
+    left: 0px;
+    right: 0px;
+    margin-left: 625px;
+}
+    #menuPage1 a:hover {
+        background: #ddd;
+        border: 1px solid #5e5e5e;
+        border-radius: 4px;
+        color: #5e5e5e
+    }
+
+
 
 #menuPage a {
     margin-left: 15px;
@@ -48,7 +68,7 @@ select {
         color: #5e5e5e
     }
 /*/*/
-* /*/*/ * /* Links inside the navbar */
+/* Links inside the navbar */
 .navbar a {
     /*display: block;*/
     color: #f2f2f2;

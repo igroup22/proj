@@ -6,22 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">-->
     <script src="../Scripts/ajaxCalls.js"></script>
     <link href="style.css" rel="stylesheet" />
 
     <!--מה שבני הוסיף בתרגיל כיתה-->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <!--<script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
-    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>-->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-    <script src="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"></script>
-    <script src="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css"></script>
+    <!--<script src="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"></script>
+    <script src="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css"></script>-->
 
 
     <script>
@@ -30,7 +30,7 @@
             GetNumMaterialList();
             getinventory();
             $("#productForm").submit(f1);
-
+            Inventoryfun();
         });
 
         var NumMaterialList;
@@ -157,15 +157,37 @@
 
         function POSTOrderSuccess() { //הוצאת סוג חומר
             console.log("perfect!");
-            document.getElementById("productForm").innerHTML = "";
+            document.getElementById("productForm").innerHTML = "הוצאה בוצעה בהצלחה";
         }
 
         function POSTOrderError() { //הוצאת סוג חומר
             alert("Expenditure err2")
         }
-        function menufun() {
-            location.replace("Menu.html"); /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+        //function menufun() {
+        //    location.replace("Menu.html"); /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+        //}
+
+        //בדיקה של כפתור חזרה לתפריט - אם הוא מנהל או לא
+             function Inventoryfun() {
+             let rolenum = localStorage["RoleNum"];
+            if (rolenum == 10)
+                document.getElementById("menuPage1").innerHTML = "<a href='Menu - manager.html'>לתפריט</a>";
+            else   document.getElementById("menuPage1").innerHTML = "<a href='Menu.html'>לתפריט</a>";
+
+            ajaxCall("GET", "../api/Inventory", "", InvySuccess, error);
         }
+
+        function InvySuccess(data) {
+            Inventorylist = data;
+        }
+
+        
+        function error() {
+            alert ("error");
+        }
+
+
+
     </script>
 </head>
 
@@ -183,13 +205,14 @@
         <br />
         <input type="submit" value="שגר למחסן" />
 
-    </form>
-    <input type="button" onclick="menufun()" value="חזרה לתפריט" />
+    </form><br />
+    <!--<input type="button" onclick="menufun()" value="חזרה לתפריט" />-->
+    <div id="menuPage1" class="navbar-brand"></div><br />
 
     <div class="semel">
         <img src="semel.svg.png" />
     </div>
-    <!--<img src="background.png" />-->
+
 
 </body>
 </html>
