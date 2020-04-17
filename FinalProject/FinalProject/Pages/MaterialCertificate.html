@@ -1,0 +1,335 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <style type="text/css">
+        button {
+            margin-left: 10px;
+        }
+
+        .colorDiv {
+            height: 30px;
+            width: 70px;
+            border: 2px solid black
+        }
+
+        #newBTN {
+            background-color: blueviolet;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+
+
+        function errGet(err) { console.log(err) }
+        $(document).ready(function () {
+
+            mode = "";
+
+            $("#cancelSaveBTN").on("click", function () {
+                car = null;
+                $("#editDiv").hide();
+                if (mode == "new") $("#pForm").show();
+                mode = "";
+            });
+
+            $("#newBTN").on("click", function () {
+                car = null;
+                mode = "new";
+                $("#pForm").hide();
+                $("#editDiv").show();
+                clearFields();
+                $("#editDiv :input").prop("disabled", false); // new mode: enable all controls in the form
+            });
+
+
+            // once the document is ready we fetch a list of Material from the server
+            ajaxCall("GET", "../api/MaterialC", "", succGet, errGet)
+
+            $("#MaterialForm").submit(onSubmitFunc); // wire the submit event to a function called f1
+
+            $("#editDiv").hide();
+            $("#saveBTN").on("click", function () {
+                onSubmitFunc();
+            });
+        });
+        // this function is activated in case of a success
+        function succGet(materialData) {
+            material = materialData; // keep the cars array in a global variable;
+            try {
+                tbl = $('#dealsTable').DataTable({
+                    data: materialData,
+                    pageLength: 5,
+                    columns: [
+                        {
+                            render: function (data, type, row, meta) {
+                                let materialD = "material-Id='" + row.Index + "'";
+
+                                editBtn = "<button type='button' class = 'editBtn btn btn-success' " + materialD + "> Edit </button>";
+                                viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + materialD + "> View </button>";
+                                deleteBtn = "<button type='button' class = 'deleteBtn btn btn-danger' " + materialD + "> Delete </button>";
+                                return editBtn + viewBtn + deleteBtn;
+                            }
+                        },
+                        { data: "NumMaterial" },
+                        { data: "ShippingCertificate" },
+                        { data: "Amountcertificate" },
+                        { data: "" },
+
+
+                    ],
+                });
+                buttonEvents();
+            }
+
+            catch (err) {
+                alert(err);
+            }
+        }
+
+        // wire all the buttons to their functions
+        function buttonEvents() {
+
+            $(document).on("click", ".editBtn", function () {
+                mode = "edit";
+                markSelected(this);
+                $("#editDiv").show();
+                $("#editDiv :input").prop("disabled", false); // edit mode: enable all controls in the form
+                populateFields(this.getAttribute('material-Id')); // fill the form fields according to the selected row
+            });
+
+            $(document).on("click", ".viewBtn", function () {
+                mode = "view";
+                markSelected(this);
+                $("#editDiv").show();
+                row.className = 'selected';
+                $("#editDiv :input").attr("disabled", "disabled"); // view mode: disable all controls in the form
+                populateFields(this.getAttribute('material-Id'));
+            });
+
+            $(document).on("click", ".deleteBtn", function () {
+                mode = "delete";
+                markSelected(this);
+                var MaterialIndex = this.getAttribute('material-Id');
+                swal({ // this will open a dialouge
+                    title: "Are you sure ??",
+                    text: "",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                })
+                    .then(function (willDelete) {
+                        if (willDelete) DeleteDeal(MaterialIndex);
+                        else swal("Not Deleted!");
+                    });
+            });
+        }
+
+        // mark the selected row
+        function markSelected(btn) {
+            $("#carsTable tr").removeClass("selected"); // remove seleced class from rows that were selected before
+            row = (btn.parentNode).parentNode; // button is in TD which is in Row
+            row.className = 'selected'; // mark as selected
+        }
+
+
+        function onSubmitFunc() {
+
+            var Id = -1;
+
+            if (mode == "edit") {
+                Id = MaterialIndex.Index;
+                Id = MaterialIndex.Index;
+
+            }
+
+
+            let materialtoSave1 = {
+                Id: Id,
+
+                numMaterial: $("#numMaterial").val(),
+                shippingCertificate: $("#shippingCertificate").val(),
+                amountcertificate: $("#amountcertificate").val(),
+                amountonreal: $("#amountonreal").val(),
+
+            }
+            let materialtoSave2 = {
+                Id: Id,
+
+                numMaterial: $("#numMaterial").val(),
+                shippingCertificate: $("#shippingCertificate").val(),
+                amountcertificate: $("#amountcertificate").val(),
+                amountonreal: $("#amountonreal").val(),
+
+            }
+
+            // add a new Car record to the server
+            if (mode == "edit")
+                ajaxCall("PUT", "../api/Deales", JSON.stringify(materialtoSave1), updateSuccess, error);
+            else if (mode == "new")
+                ajaxCall("POST", "../api/Deales", JSON.stringify(materialtoSave1), insertSuccess, error);
+            return false;
+        }
+
+        // fill the form fields
+        function populateFields(DealId) {
+            deal = getsale(DealId);
+            $("#numMaterial").val(material.numMaterial);
+            $("#shippingCertificate").val(material.shippingCertificate);
+            $("#amountcertificate").val(material.amountcertificate);
+
+
+
+        }
+
+        function getsale(id) {
+            for (i in material) {
+                if (material[i].Index == id)
+                    return material[i];
+            }
+            return null;
+        }
+
+
+
+
+
+        // success callback function after update
+        function updateSuccess(materialData) {
+            tbl.clear();
+            redrawTable(tbl, materialData);
+            buttonEvents();
+            $("#editDiv").hide();
+            swal("Updated Successfuly!", "Great Job", "success");
+            mode = "";
+        }
+
+        // success callback function after update
+        function insertSuccess(materialData) {
+            $("#pForm").show();
+            tbl.clear();
+            redrawTable(tbl, Dealssdata);
+            buttonEvents();
+            $("#editDiv").hide();
+            swal("Inserted Successfuly!", "Great Job", "success");
+            mode = "";
+        }
+        // Delete a Deal from the server
+        function DeleteDeal(id) {
+            $("#editDiv").hide();
+            ajaxCall("DELETE", "../api/Deales/deleteSale/" + id, "", deleteSuccess, deleteerror);
+        }
+
+        // success callback function after delete
+        function deleteSuccess(materialData) {
+            tbl.clear();
+            redrawTable(tbl, Dealssdata);
+            buttonEvents(); // after redrawing the table, we must wire the new buttons
+            $("#editDiv").hide();
+            swal("Deleted Successfuly!", "Great Job", "success");
+            mode = "";
+        }
+        function deleteerror(err) { console.log(err) }
+
+        // redraw a datatable with new data
+        function redrawTable(tbl, data) {
+            tbl.clear();
+            for (var i = 0; i < data.length; i++) {
+                tbl.row.add(data[i]);
+            }
+            tbl.draw();
+        }
+
+
+
+        // this function is activated in case of a failure
+        function error(err) {
+            swal("Error: " + err);
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Material DataTable Example</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <input type="button" value="New" class="btn btn-primary btn-lg" id="newBTN" />
+        <form id="pForm">
+            <table id="dealsTable" class="display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>num Material</th>
+                        <th>shipping Certificate</th>
+                        <th>amount certificate</th>
+                        <th>amount on real</th>
+
+
+
+                    </tr>
+                </thead>
+            </table>
+
+        </form>
+
+        <div id="editDiv">
+            <form id="MaterialForm">
+                <div class="form-group row">
+                    <div class="form-group col-sm-3">
+                        <label for="numMaterial"><span class="red-star">★ </span>num Material</label>
+                        <input type="text" class="form-control" id="numMaterial" placeholder="Enter the num of Material" required>
+                    </div>
+
+
+                    <div class="form-group col-sm-3">
+                        <label for="shippingCertificate"><span class="red-star">★ </span>shipping Certificate</label>
+                        <input type="text" class="form-control" id="shippingCertificate" placeholder="Enter the shipping Certificate" required>
+                    </div>
+
+
+                    <div class="form-group col-sm-3">
+                        <label for="amountcertificate"><span class="red-star">★ </span>amount certificate</label>
+                        <input type="text" id="amountcertificate" class="form-control" placeholder="Enter the amount in certificate" required />
+
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="amountonreal"><span class="red-star">★ </span>amount on real</label>
+                        <input type="text" id="amountonreal" class="form-control" placeholder="Enter the amount on real" required />
+                    </div>
+
+
+                </div>
+
+
+                <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">Save</button>
+                <input type="button" class="btn btn-warning btn-lg" id="cancelSaveBTN" value="Cancel" />
+            </form>
+        </div>
+
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,363 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+    <link href="style.css" rel="stylesheet" />
+    <script>
+
+
+        function errGet(err) { console.log(err) }
+        $(document).ready(function () {
+            Inventoryfun();
+            mode = "";
+
+            $("#cancelSaveBTN").on("click", function () {
+                car = null;
+                $("#editDiv").hide();
+                if (mode == "new") $("#pForm").show();
+                mode = "";
+
+            });
+
+            $("#newBTN").on("click", function () {
+                car = null;
+                mode = "new";
+                $("#pForm").hide();
+                $("#shippingCertificate").val(localStorage["ShippingCertificate"]);
+                $("#numMaterial").val("");
+                $("#productionID").val("");
+
+                $("#amountcertificate").val("");
+                $("#amountonreal").val("");
+
+                $("#editDiv").show();
+
+                $("#editDiv :input").prop("disabled", false); // new mode: enable all controls in the form
+
+            });
+
+            // once the document is ready we fetch a list of Material from the server
+            ajaxCall("GET", "../api/ShippingReceived", "", succGet, errGet)
+
+            $("#MaterialForm").submit(onSubmitFunc); // wire the submit event to a function called f1
+
+            $("#editDiv").hide();
+            $("#saveBTN").on("click", function () {
+                onSubmitFunc();
+            });
+        });
+
+        function Inventoryfun() {
+             let rolenum = localStorage["RoleNum"];
+            if (rolenum == 10)
+                document.getElementById("menuPage").innerHTML = "<a href='Menu - manager.html'>לתפריט</a>";
+            else   document.getElementById("menuPage").innerHTML = "<a href='Menu.html'>לתפריט</a>";
+
+            ajaxCall("GET", "../api/Inventory", "", InvySuccess, error);
+        }
+
+        function InvySuccess(data) {
+            Inventorylist = data;
+        }
+        // this function is activated in case of a success
+        function succGet(materialData) {
+            btnlist = [];
+            material = materialData; // keep the cars material in a global variable;
+            Certificatematerial = [];
+            i = 0;
+            for (k in material) {
+                if (localStorage["ShippingCertificate"] == material[k].ShippingCertificate)
+                    Certificatematerial[i++] = (material[k]);
+            }
+            try {
+                tbl = $('#materialsTable').DataTable({
+                    data: Certificatematerial,
+                    pageLength: 5,
+                    columns: [
+                        {
+                            render: function (data, type, row, meta) {
+                                let materialD = "material-Id='" + row.NumMaterial + "'";
+
+                                editBtn = "<button type='button' class = 'editBtn btn btn-success' id='" + row.NumMaterial + "'" + materialD + "> עריכה </button>";
+                                viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + materialD + "> צפייה </button>";
+                                //deleteBtn = "<button type='button' class = 'deleteBtn btn btn-danger' " + materialD + "> מחיקה </button>";
+
+                                return editBtn + viewBtn;
+                                //return editBtn + viewBtn + deleteBtn;
+                            }
+                        },
+                        {
+                            data: "AmountReceived"
+                            //render: function (data, type, row, meta) {
+                            //    let materialD = "material-Id='" + row.numMaterial + "'";
+
+                            //    textAmount = "  <input type = 'text'  id = 'numMaterialTEXT' placeholder = 'הכנס כמות בפועל'  >";
+
+                            //    return textAmount;
+                            //}
+                        },
+                        { data: "AmountExcepted" },
+                        { data: "ProductionID" },
+                        { data: "NumMaterial" },
+                        { data: "ShippingCertificate" }
+
+
+                    ],
+                });
+                buttonEvents();
+            }
+
+            catch (err) {
+                alert(err);
+            }
+        }
+
+        // wire all the buttons to their functions
+        function buttonEvents() {
+
+            $(document).on("click", ".editBtn", function () {
+                mode = "edit";
+                markSelected(this);
+
+                $("#editDiv").show();
+                $("#editDiv :input").prop("disabled", false); // edit mode: enable all controls in the form
+                populateFields(this.getAttribute('material-Id')); // fill the form fields according to the selected row
+            });
+
+            $(document).on("click", ".viewBtn", function () {
+                mode = "view";
+                markSelected(this);
+                $("#editDiv").show();
+                row.className = 'selected';
+                $("#editDiv :input").attr("disabled", "disabled"); // view mode: disable all controls in the form
+                populateFields(this.getAttribute('material-Id'));
+            });
+  
+        }
+        function populateFields(idMarerial) {
+            material1 = getMaterial(idMarerial);
+            $("#shippingCertificate").val(material1.ShippingCertificate);
+            $("#numMaterial").val(material1.NumMaterial);
+            $("#productionID").val(material1.ProductionID);
+            $("#amountcertificate").val(material1.AmountExcepted);
+            $("#amountonreal").val(material1.AmountReceived);
+            if (mode == "edit")
+                btnlist[i++] = [material1.NumMaterial];
+            document.getElementById(material1.NumMaterial).disabled = true;
+        }
+
+        function getMaterial(id) {
+            for (i in material) {
+                if (material[i].NumMaterial == id) {
+                    return material[i];
+                    break;
+                }
+            }
+            return null;
+        }
+
+        // mark the selected row
+        function markSelected(btn) {
+            $("#materialsTable tr").removeClass("selected"); // remove seleced class from rows that were selected before
+            row = (btn.parentNode).parentNode; // button is in TD which is in Row
+            row.className = 'selected'; // mark as selected
+        }
+
+
+        function onSubmitFunc() {
+
+
+            let materialtoSave1 = {
+
+                NumMaterial: $("#numMaterial").val(),
+                ProductionID: $("#productionID").val(),
+                AmountExcepted: parseInt($("#amountcertificate").val()),
+                AmountReceived: parseInt($("#amountonreal").val()),
+                ShippingCertificate: $("#shippingCertificate").val(),
+            }
+
+            //check amount
+            if ($("#amountcertificate").val() != $("#amountonreal").val()) {
+
+                var r = confirm("כמות ההזמנה לא שווה לכמות בפועל");
+                if (r == true) {
+                    console.log("true")
+                }
+                else {
+                    console.log("false")
+                    return false;
+                }
+            }
+
+            let inv = getinv();
+            if (inv == null) {
+                alert("חומר זה לא קיים במלאי!")
+            }
+            let materialtoSave2 = {
+                NumMaterial: $("#numMaterial").val(),
+                ProductionID: $("#productionID").val(),
+                AmountInventory: inv.AmountInventory + parseInt($("#amountonreal").val()),
+            }
+
+            // add/edit a new Material record to the server
+            if (mode == "edit") {
+                ajaxCall("PUT", "../api/Inventory", JSON.stringify(materialtoSave2), InventorySuccess, error);
+                ajaxCall("PUT", "../api/ShippingReceived", JSON.stringify(materialtoSave1), updateSuccess, error);
+            }
+            else if (mode == "new")
+                ajaxCall("POST", "../api/ShippingReceived", JSON.stringify(materialtoSave1), insertSuccess, error);
+            return false;
+        }
+
+        function getinv() {
+            for (k in Inventorylist) {
+                if ($("#numMaterial").val() == Inventorylist[k].NumMaterial && $("#productionID").val() == Inventorylist[k].ProductionID) {
+                    return Inventorylist[k];
+                    break;
+                }
+            }
+            return null;
+        }
+        function InventorySuccess(data) {
+            console.log(data)
+        }
+        function Inventoryerror(err) { console.log(err) }
+        // fill the form fields
+
+
+        // success callback function after update
+        function updateSuccess(materialData) {
+            ajaxCall("GET", "../api/ShippingReceived", "", succGet1, errGet)
+
+        }
+        function succGet1(materialData) {
+            tbl.clear();
+            redrawTable(tbl, Certificatematerial);
+            buttonEvents();
+            $("#editDiv").hide();
+            swal("Updated Successfuly!", "Great Job", "success");
+            mode = "";
+
+        }
+
+        // success callback function after update
+        function insertSuccess(materialData) {
+            $("#pForm").show();
+            ajaxCall("GET", "../api/ShippingReceived", "", succGet1, errGet)
+
+        }
+
+   
+
+        // redraw a datatable with new data
+        function redrawTable(tbl, data) {
+            tbl.clear();
+            for (var i = 0; i < data.length; i++) {
+                tbl.row.add(data[i]);
+            }
+            tbl.draw();
+        }
+
+        // this function is activated in case of a failure
+        function error(err) {
+            swal("Error: " + err);
+        }
+    
+    </script>
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a href="ShippingReceived.html" class="navbar-brand"> טבלת חומרים להכנסה</a>
+
+                <!--<input type="button" onclick="menufun()" class="navbar-brand" value="חזרה לתפריט" />-->
+                <div id="menuPage" class="navbar-brand"></div>
+            </div>
+            <!--<a href="Menu.html" id="MenuReturn" class="navbar-brand">חזרה לתפריט</a>-->
+
+        </div>
+    </nav>
+
+    <div class="container">
+        <input type="button" value="הוספת חומר חדש" class="btn btn-primary btn-lg" id="newBTN" />
+        <form id="pForm" onsubmit="return false">
+            <table id="materialsTable" class="display nowrap" style="width:100%">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>:כמות בפועל</th>
+                        <th>:כמות בהזמנה</th>
+                        <th>:סוג ייצור</th>
+                        <th>:מספר חומר</th>
+                        <th>:מספר תעודת משלוח</th>
+
+                    </tr>
+                </thead>
+            </table>
+        </form>
+
+        <div id="editDiv">
+            <form id="MaterialForm" onsubmit="return false">
+                <div class="form-group col-sm-3">
+                    <label for="shippingCertificate"><span class="red-star">★ </span>תעודת משלוח</label>
+                    <input type="text" class="form-control" id="shippingCertificate" placeholder="הכנס מספר תעודת משלוח" required>
+                </div>
+
+
+                <div class="form-group row">
+                    <div class="form-group col-sm-3">
+                        <label for="numMaterial"><span class="red-star">★ </span>מספר החומר</label>
+                        <input type="text" class="form-control" id="numMaterial" placeholder="הכנס מספר חומר" required>
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="productionID"><span class="red-star">★ </span>סוג ייצור</label>
+                        <input type="text" id="productionID" class="form-control" placeholder="הכנס מספר סוג ייצור" required />
+
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="amountcertificate"><span class="red-star">★ </span>כמות בהזמנה</label>
+                        <input type="text" id="amountcertificate" class="form-control" placeholder="הכנס כמות בתעודה" required />
+
+                    </div>
+
+                    <div class="form-group col-sm-3">
+                        <label for="amountonreal"><span class="red-star">★ </span>כמות בפועל</label>
+                        <input type="text" id="amountonreal" class="form-control" placeholder="הכנס כמות בפועל" required />
+                    </div>
+
+
+                </div>
+
+
+                <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">שמור</button>
+                <input type="button" class="btn btn-warning btn-lg" id="cancelSaveBTN" value="ביטול" />
+            </form>
+        </div>
+
+    </div>
+    <div class="semel">
+        <img src="semel.svg.png" />
+    </div>
+</body>
+</html>

@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Phone Book App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+    <script src="../Scripts/ajaxCalls.js"></script>
+    <link href="style.css" rel="stylesheet" />
+
+    <!--מה שבני הוסיף בתרגיל כיתה-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"></script>
+    <script src="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css"></script>
+
+
+    <script>
+
+        $(document).ready(function () {
+            GetNumMaterialList();
+            getinventory();
+            $("#productForm").submit(f1);
+
+        });
+
+        var NumMaterialList;
+        function f1() {
+            AddExpenditure();
+
+            return false;
+        }
+        function getinventory() {
+            ajaxCall("GET", "../api/ExpenditureProducts", "", GSuccessE, GErrE)
+
+        }
+        function GSuccessE(data) {
+            console.log(data)
+            Inventorylist = data;
+        }
+        function GErrE(err) { alert(err) }
+
+        function GetNumMaterialList() {
+
+            ajaxCall("GET", "../api/ExpenditureProducts/NumMaterialList", "", GETNumMaterialSuccess, GETNumMaterialError)
+        }
+
+        i = 0;
+        function GETNumMaterialSuccess(materialdata) {
+            NumMaterialList = materialdata
+            //alert("סוג מקט החומר הגיע בהצלחה")
+            //document.getElementById("type").innerHTML += "";
+            //for (P in NumMaterialList) {
+            //    var x = document.getElementById("type");
+            //    var option = document.createElement("option"); //ניצור את הרשימה הנגללת
+            //    option.text = NumMaterialList[P].NumMaterial; //סוגי המקטים
+            //    x.add(option);
+            AddMaterial();
+        }
+        function AddMaterial() {
+            var str = "";
+            str += "<div>";
+            str += "מקט פנימי:"
+            str += "<select id='M" + i + "' required> <option value=''>בחר מקט</option>";
+
+            for (var j = 0; j < NumMaterialList.length; j++) {
+                str += "<option value='" + NumMaterialList[j].NumMaterial + "'>" + NumMaterialList[j].NumMaterial + "</option>";
+
+            }
+            str += "</select > ";
+            str += "כמות:"
+            str += "<input type='text' id='Q" + i + "' value = ''/>";
+            str += "</div>";
+            i += 1;
+            document.getElementById("MA").insertAdjacentHTML('beforeend', str);
+
+            return false;
+        }
+
+        function GETNumMaterialError() {
+            alert("err")
+        }
+
+        function AddExpenditure() { //הוספה לטבלת הוצאה כשלוחצים שגר למחסן
+
+            let employeenum = localStorage["employeenum"]; //הוספת מס עובד מהלוקל סטורג מדף לוגאין
+            let productionID = localStorage["productionID"]; //הוספת סוג ייצור מהלוקל סטורג מדף לוגאין
+
+            d = new Date().getDate();
+            m = new Date().getMonth() + 1; //פונקציה שמתחילה מ0-ינואר
+            y = new Date().getFullYear();
+
+            NewExpenditure = {
+                "ExpenditureDate": d + "/" + m + "/" + y, //תאריך ושעה נוכחיים
+                "EmployeeNum": employeenum, //לוקל סטורג
+                "ProductionID": productionID, //לוקל סטורג
+            }
+
+            ajaxCall("POST", "../api/ExpenditureProducts", JSON.stringify(NewExpenditure), POSTOrderSuccessCB, POSTOrderErrorCB)
+
+        }
+        //NewExpenditureArray;
+        function POSTOrderSuccessCB(data) {
+
+            console.log(data); ///מספר הוצאה שחזר באקסיקיוט-סקאלר
+
+            for (var k = 0; k < i; k++) { //k הוא משתנה שיעבור על כל הדיבים שיווצרו לפי המקט-כמות
+
+                N = ($("#M" + k).val()); //מקט פנימי
+                A = $("#Q" + k).val(); //כמות
+
+                Expenditure = {
+                    "ExpenditureNum": data, //מספר הוצאה
+                    "NumMaterial": N, //מקט פנימי
+                    "Amount": A, //כמות שהוצאתי מטבלת הוצאת סוג חומר
+                }
+                temp = 0
+                for (j in Inventorylist) {
+                    if (Inventorylist[j].NumMaterial == N && Inventorylist[j].AmountInventory >= A && Inventorylist[j].ProductionID == localStorage["productionID"]) {
+                        let materialtoSave2 = {
+                            NumMaterial: N,
+                            ProductionID: localStorage["productionID"],
+                            AmountInventory: parseInt(Inventorylist[j].AmountInventory) - parseInt(A),
+                        }
+                        temp = 1;
+                        ajaxCall("PUT", "../api/ExpenditureProducts", JSON.stringify(materialtoSave2), POSTOrderSuccess, POSTOrderErrorCB);
+                    }
+                }
+                if (temp == 1) {
+                    //NewExpenditureArray.push(Expenditure);
+                    ajaxCall("POST", "../api/ExpenditureProducts/insertMExpenditure", JSON.stringify(Expenditure), POSTOrderSuccess, POSTOrderError)
+                }
+                else {
+                    g = "M" + k;
+                    document.getElementById(g).style.backgroundColor = "red";
+                    l = "Q" + k;
+                    document.getElementById(l).style.backgroundColor = "red";
+                    alert(" " + N + " אין מספיק מחומר ");
+                }
+            }
+
+        }
+
+
+        function POSTOrderErrorCB() {
+            alert("Expenditure err1")
+        }
+
+        function POSTOrderSuccess() { //הוצאת סוג חומר
+            console.log("perfect!");
+            document.getElementById("productForm").innerHTML = "";
+        }
+
+        function POSTOrderError() { //הוצאת סוג חומר
+            alert("Expenditure err2")
+        }
+        function menufun() {
+            location.replace("Menu.html"); /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+        }
+    </script>
+</head>
+
+<body dir="rtl">
+
+
+    <form id="productForm">
+        <div id="MA">
+            <h2>מסך הוצאת סחורה מהמחסן</h2>
+        </div>
+        <input type="button" value="+" onclick="AddMaterial()" />
+        <br />
+        <br />
+        <br />
+        <br />
+        <input type="submit" value="שגר למחסן" />
+
+    </form>
+    <input type="button" onclick="menufun()" value="חזרה לתפריט" />
+
+    <div class="semel">
+        <img src="semel.svg.png" />
+    </div>
+    <!--<img src="background.png" />-->
+
+</body>
+</html>
+
