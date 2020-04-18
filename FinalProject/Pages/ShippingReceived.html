@@ -29,7 +29,6 @@
             mode = "";
 
             $("#cancelSaveBTN").on("click", function () {
-                car = null;
                 $("#editDiv").hide();
                 if (mode == "new") $("#pForm").show();
                 mode = "";
@@ -43,7 +42,6 @@
                 $("#shippingCertificate").val(localStorage["ShippingCertificate"]);
                 $("#numMaterial").val("");
                 $("#productionID").val("");
-
                 $("#amountcertificate").val("");
                 $("#amountonreal").val("");
 
@@ -56,13 +54,17 @@
             // once the document is ready we fetch a list of Material from the server
             ajaxCall("GET", "../api/ShippingReceived", "", succGet, errGet)
 
-            //$("#MaterialForm").submit(onSubmitFunc); 
+            $("#MaterialForm").submit(onSubmitFunc);
 
             $("#editDiv").hide();
-            $("#saveBTN").submit(onSubmitFunc);
-            $("#saveBTN").on("click", function () {
-                onSubmitFunc();
-            });
+
+            //$("#saveBTN").submit(onSubmitFunc);
+
+
+
+            //$("#saveBTN").on("click", function () {
+            //    onSubmitFunc();
+            //});
         });
 
         function Inventoryfun() {
@@ -77,16 +79,23 @@
         function InvySuccess(data) {
             Inventorylist = data;
         }
-        // this function is activated in case of a success
-        function succGet(materialData) {
-            btnlist = [];
-            material = materialData; // keep the cars material in a global variable;
+        function Certificatecheck(material) {
             Certificatematerial = [];
             i = 0;
+            // this loop return only the relevant Certificate
             for (k in material) {
                 if (localStorage["ShippingCertificate"] == material[k].ShippingCertificate)
                     Certificatematerial[i++] = (material[k]);
             }
+            return Certificatematerial;
+        }
+
+        function succGet(materialData) {
+
+
+            btnlist = [];
+            material = materialData;
+            Certificatematerial = Certificatecheck(material);
             try {
                 tbl = $('#materialsTable').DataTable({
                     data: Certificatematerial,
@@ -96,21 +105,17 @@
                             render: function (data, type, row, meta) {
                                 let materialD = "material-Id='" + row.NumMaterial + "'";
 
-                                editBtn = "<button type='button' class = 'editBtn btn btn-success' id='" + row.NumMaterial + "'" + materialD + "> עריכה </button>";
+                                editBtn = "<button type='button' class = 'editBtn btn btn-success' id='" + row.NumMaterial + row.ProductionID + "'" + materialD + "onclick='look(this)'> עריכה </button>";
                                 viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + materialD + "> צפייה </button>";
-                                //deleteBtn = "<button type='button' class = 'deleteBtn btn btn-danger' " + materialD + "> מחיקה </button>";
 
                                 return editBtn + viewBtn;
-                                //return editBtn + viewBtn + deleteBtn;
                             }
                         },
                         {
                             data: "AmountReceived"
                             //render: function (data, type, row, meta) {
                             //    let materialD = "material-Id='" + row.numMaterial + "'";
-
                             //    textAmount = "  <input type = 'text'  id = 'numMaterialTEXT' placeholder = 'הכנס כמות בפועל'  >";
-
                             //    return textAmount;
                             //}
                         },
@@ -129,7 +134,13 @@
                 alert(err);
             }
         }
+        x = 0;
+        btnid = [];
+        function look(btn) {
 
+            btnid[x++] = btn.id;
+
+        }
         // wire all the buttons to their functions
         function buttonEvents() {
 
@@ -161,7 +172,7 @@
             $("#amountonreal").val(material1.AmountReceived);
             if (mode == "edit")
                 btnlist[i++] = [material1.NumMaterial];
-            document.getElementById(material1.NumMaterial).disabled = true;
+            //document.getElementById(material1.NumMaterial).disabled = true;
         }
 
         function getMaterial(id) {
@@ -199,30 +210,30 @@
                 var r = confirm("כמות ההזמנה לא שווה לכמות בפועל");
                 if (r == true) {
                     console.log("true");
-                //    var nodemailer = ('nodemailer');
+                    //    var nodemailer = ('nodemailer');
 
-                //    var transporter = nodemailer.createTransport({
-                //        service: 'gmail',
-                //        auth: {
-                //            user: 'nogahirschmann@gmail.com',
-                //            pass: 'noga1210'
-                //        }
-                //    });
+                    //    var transporter = nodemailer.createTransport({
+                    //        service: 'gmail',
+                    //        auth: {
+                    //            user: 'nogahirschmann@gmail.com',
+                    //            pass: 'noga1210'
+                    //        }
+                    //    });
 
-                //    var mailOptions = {
-                //        from: 'nogahirschmann@gmail.com',
-                //        to: 'nogaspamnoga@gmail.com',
-                //        subject: 'Sending Email using Node.js',
-                //        text: 'לא הגיע מספיק מחומר'
-                //    };
+                    //    var mailOptions = {
+                    //        from: 'nogahirschmann@gmail.com',
+                    //        to: 'nogaspamnoga@gmail.com',
+                    //        subject: 'Sending Email using Node.js',
+                    //        text: 'לא הגיע מספיק מחומר'
+                    //    };
 
-                //    transporter.sendMail(mailOptions, function (error, info) {
-                //        if (error) {
-                //            console.log(error);
-                //        } else {
-                //            console.log('Email sent: ' + info.response);
-                //        }
-                //    });
+                    //    transporter.sendMail(mailOptions, function (error, info) {
+                    //        if (error) {
+                    //            console.log(error);
+                    //        } else {
+                    //            console.log('Email sent: ' + info.response);
+                    //        }
+                    //    });
 
 
                 }
@@ -261,25 +272,31 @@
             }
             return null;
         }
-        function InventorySuccess(data) {
-            console.log(data)
-        }
+        function InventorySuccess(data) { console.log(data) }
+
         function Inventoryerror(err) { console.log(err) }
-        // fill the form fields
 
 
-        // success callback function after update
+        // success callback function
         function updateSuccess(materialData) {
             ajaxCall("GET", "../api/ShippingReceived", "", succGet1, errGet)
 
         }
         function succGet1(materialData) {
+
             tbl.clear();
+            Certificatematerial = Certificatecheck(materialData);
             redrawTable(tbl, Certificatematerial);
             buttonEvents();
             $("#editDiv").hide();
             swal("Updated Successfuly!", "Great Job", "success");
             mode = "";
+            if (btnid != "") {
+                for (z in btnid) {
+                    bt = btnid[z];
+                    document.getElementById(bt).disabled = true;
+                }
+            }
 
         }
 
@@ -289,7 +306,6 @@
             ajaxCall("GET", "../api/ShippingReceived", "", succGet1, errGet)
 
         }
-
 
 
         // redraw a datatable with new data
@@ -342,7 +358,7 @@
         </form>
 
         <div id="editDiv">
-            <form id="MaterialForm" >
+            <form id="MaterialForm" onsubmit="return false">
                 <div class="form-group col-sm-3">
                     <label for="shippingCertificate"><span class="red-star">★ </span>תעודת משלוח</label>
                     <input type="text" class="form-control" id="shippingCertificate" placeholder="הכנס מספר תעודת משלוח" required>

@@ -160,8 +160,10 @@
                 document.getElementById("form").reset();
                 document.getElementById("x").innerHTML = "סיסמא שגויה אנא נסה שנית";
             }
-            if (data.RoleNum == 10) { GoMenuM(); }
-            else GoMenu();
+            else {
+                if (data.RoleNum == 10) { GoMenuM(); }
+                else GoMenu();
+            }
         }
         function getErrorM(data) {
            
