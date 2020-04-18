@@ -56,9 +56,10 @@
             // once the document is ready we fetch a list of Material from the server
             ajaxCall("GET", "../api/ShippingReceived", "", succGet, errGet)
 
-            $("#MaterialForm").submit(onSubmitFunc); 
+            //$("#MaterialForm").submit(onSubmitFunc); 
 
             $("#editDiv").hide();
+            $("#saveBTN").submit(onSubmitFunc);
             $("#saveBTN").on("click", function () {
                 onSubmitFunc();
             });
@@ -341,7 +342,7 @@
         </form>
 
         <div id="editDiv">
-            <form id="MaterialForm" onsubmit="return false">
+            <form id="MaterialForm" >
                 <div class="form-group col-sm-3">
                     <label for="shippingCertificate"><span class="red-star">★ </span>תעודת משלוח</label>
                     <input type="text" class="form-control" id="shippingCertificate" placeholder="הכנס מספר תעודת משלוח" required>
