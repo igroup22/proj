@@ -1,0 +1,459 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Manager Inventory Check</title>
+
+
+
+    <meta charset="utf-8" />
+   
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+
+
+    <link href="style.css" rel="stylesheet" />
+
+
+
+    <script src="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"></script>
+    <script src="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css"></script>
+
+    <style>
+        .btn {
+            background-color: lightgrey;
+            border-radius: 6px;
+            text-align: center;
+            transition-duration: 0.4s;
+            border: 1px solid black;
+            margin-top: 10px;
+            margin-right: 10px;;
+        }
+
+            .btn:hover {
+                background-color: darkgrey;
+                color: white;
+            }
+
+        #reporttable {
+            border: 2px solid black;
+            text-align: center;
+        }
+        
+        #menu {
+            margin-top: 15px;
+        }
+
+        #Ccheck {
+            visibility: hidden;
+        }
+        #sumDiv {
+            display: none;
+            margin-top: 15px;
+        }
+        #iii{
+            padding-right:30px;
+        }
+
+     
+    </style>
+
+    <script>
+
+        var MaterialList;
+
+        $(document).ready(function () {
+
+            console.log("doc is ready");
+            $("#Mdiv").show();
+            $("#MTableDiv").hide();
+            $("#Mform").submit(f1);
+            $("#editDiv").hide();
+            //$("#reportDiv").hide();
+
+        });
+
+        var myInput = document.getElementById("NCI");
+
+
+        function f1() {
+
+            ajaxCall("GET", "../api/InventoryCheckController/MCheckList", "", SuccsessM, ErrorM);
+            return false;
+        }
+
+        function SuccsessM(data) {
+            console.log(data);
+            MaterialList = data; // שמרנו את הרשימה שהתקבלה מהדאטה גם למשתנה גלובלי
+            RMN1 = $("#NCI").val();
+            for (x in data)
+                if (RMN1 == data[x].CheckNumber) {
+                    document.getElementById("Certificate").innerHTML = data[x].CheckNumber;
+                    document.getElementById("Ccheck").style.visibility = 'visible';
+                    document.getElementById("Certificate2").innerHTML = "<button type='button' class='btn' onclick='MCheckShow()' id='showBTN'>למעבר לספירת המלאי</button>";
+                    localStorage["InventoryCheckNumber"] = RMN1;
+                    break;
+                }
+                else {
+                    str = "לא קיימת ספירת מלאי שמספרה - " + RMN1;
+                    document.getElementById("Certificate").innerHTML = str;
+                }
+
+            Checkmaterial = [];
+            i = 0;
+            for (k in MaterialList) {
+                if (localStorage["InventoryCheckNumber"] == MaterialList[k].CheckNumber)
+                    Checkmaterial[i++] = (MaterialList[k]);
+            }
+
+            try {
+                tbl = $('#checkTable').DataTable({
+                    data: Checkmaterial,
+                    pageLength: 5,
+                    columns: [
+                        {
+                            data: "MaterialId"
+
+                        },
+                        { data: "ProductionId" },
+                        { data: "InventoryAmount" },
+                        { data: "CheckAmount" },
+                        { data: "CheckNumber" },
+                        {
+                            render: function (data, type, row, meta) {
+                                let mlD = "material-Id='" + row.MaterialId + "'";
+
+                                editBtn = "<button type='button' class = 'editBtn btn btn-success' id='" + row.MaterialId + "'" + mlD + "> עריכה </button>";
+                                viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + mlD + "> צפייה </button>";
+
+
+                                return editBtn + viewBtn;
+
+                            }
+                        }
+
+
+                    ],
+                });
+                buttonEvents();
+            }
+
+            catch (err) {
+                alert(err);
+            }
+
+
+        }
+
+        function MCheckShow() {
+            $("#Mdiv").hide();
+            $("#MTableDiv").show();
+        }
+
+
+        // wire all the buttons to their functions
+        function buttonEvents() {
+
+            $(document).on("click", ".editBtn", function () {
+                mode = "edit";
+                markSelected(this);
+
+                $("#editDiv").show();
+                $("#editDiv :input").prop("disabled", false); // edit mode: enable all controls in the form
+                populateFields(this.getAttribute('material-Id')); // fill the form fields according to the selected row
+            });
+
+            $(document).on("click", ".viewBtn", function () {
+                mode = "view";
+                markSelected(this);
+                $("#editDiv").show();
+                row.className = 'selected';
+                $("#editDiv :input").attr("disabled", "disabled"); // view mode: disable all controls in the form
+                populateFields(this.getAttribute('material-Id'));
+            });
+
+        }
+
+        // mark the selected row
+        function markSelected(btn) {
+            $("#checkTable tr").removeClass("selected"); // remove seleced class from rows that were selected before
+            row = (btn.parentNode).parentNode; // button is in TD which is in Row
+            row.className = 'selected'; // mark as selected
+        }
+
+        function populateFields(idMarerial) {
+            material1 = getMaterial(idMarerial);
+            $("#materialNumber").val(material1.MaterialId);
+            $("#productionID").val(material1.ProductionID);
+            $("#inventoryAmount").val(material1.InventoryAmount);
+            $("#amountInCheck").val(material1.CheckAmount);
+            $("#CheckNumber").val(material1.CheckNumber);
+            if (mode == "edit")
+                btnlist[i++] = [material1.NumMaterial];
+            document.getElementById(material1.NumMaterial).disabled = true;
+        }
+
+        function getMaterial(id) {
+            for (i in material) {
+                if (material[i].MaterialId == id) {
+                    return material[i];
+                    break;
+                }
+            }
+            return null;
+        }
+
+        $("#cancelSaveBTN").on("click", function () {
+            car = null;
+            $("#editDiv").hide();
+            if (mode == "new") $("#pForm").show();
+            mode = "";
+
+        });
+
+        $("#NewBTN").on("click", function () {
+       
+            mode = "new";
+            $("#pForm").hide();
+            $("#materialNumber").val("");
+            $("#productionID").val("");
+            $("#inventoryAmount").val("");
+            $("#amountInCheck").val("");
+            $("#CheckNumber").val(localStorage["CheckNumber"]);
+            
+
+            $("#editDiv").show();
+
+            $("#editDiv :input").prop("disabled", false); // new mode: enable all controls in the form
+
+        });
+
+        $(document).on("click", "#repBTN", function () {
+            $("#reportDiv").toggle();
+        });
+
+        function Report() {
+            var tmp = "";
+            var Cnumber = localStorage["CheckNumber"];
+            for (var i = 0; i < MaterialList.length; i++) {
+
+                if ((MaterialList[i].InventoryAmount - MaterialList[i].CheckAmount) != 0) {
+                    // בתנאי השני אמור לבוא מספר ההוצאה- אבל בגלל שיש שגיאה שמתי כרגע מספר
+                    if (MaterialList[i].CheckNumber == 20) {
+                        tmp += "<tr><td >" + MaterialList[i].MaterialId + "</td>";
+                        tmp += "<td >" + MaterialList[i].ProductionId + "</td>";
+                        PN = (MaterialList[i].CheckAmount) - (MaterialList[i].InventoryAmount);
+                        tmp += "<td >" + PN + "</td></tr>";
+                    }
+                    
+                }
+
+            }
+            document.getElementById("reporttable").innerHTML = tmp;
+        }
+
+        function SumMaterial() {
+            var x = document.getElementById("sumDiv");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+            var SUMstr = "";
+            SUMstr += "<label>בחר מקט:</label>"
+            SUMstr += "<select id='makatid' required> <option value=''>בחר מקט</option>";
+
+            t = 0;
+            for (var j = 0; j < MaterialList.length; j++) {
+                var check = 0;
+                for (var i = 0; i < j; i++) {
+                    if (MaterialList[j].MaterialId == MaterialList[i].MaterialId) {
+                        check = 1;
+                    }
+                }
+                if (check == 0) {
+                    SUMstr += "<option value='" + MaterialList[j].MaterialId + "'>" + MaterialList[j].MaterialId + "</option>";
+                }
+
+
+            }
+            SUMstr += "</select > ";
+            SUMstr += "<button type='button' class='btn' onclick='ShowSum()' id='showsum'>הצג</button>";
+            SUMstr += "<table align='center' id='sumtable'></table>";
+            SUMstr += "<br/><button type='button' class='btn' onclick='closeDiv()' id='closeBTN'>סגור</button>";
+
+
+            document.getElementById("sumDiv").innerHTML = SUMstr;
+        }
+
+        function ShowSum() {
+            show = ($("#makatid").val());
+            
+            var Stmp = "";
+
+            Stmp += "<tr><th id='iii'> מקט</tי>";
+            Stmp += "<th id='iii'>קוד ייצור</th>";
+            Stmp += "<th id='iii'>כמות במלאי</th>";
+            Stmp += "<th id='iii'>כמות בספירה</th></tr>";
+
+            for (var k = 0; k < MaterialList.length; k++) {
+                if ((MaterialList[k].MaterialId == show) && (localStorage["InventoryCheckNumber"] == MaterialList[k].CheckNumber)) {
+                    
+                    Stmp += "<tr><td id='iii'>" + MaterialList[k].MaterialId + "</td>";
+                    Stmp += "<td id='iii'>" + MaterialList[k].ProductionId + "</td>";
+                    Stmp += "<td id='iii'>" + MaterialList[k].InventoryAmount + "</td>";
+                    Stmp += "<td id='iii'>" + MaterialList[k].CheckAmount + "</td></tr>";
+
+                 
+                }
+            }
+
+
+            document.getElementById("sumtable").innerHTML = Stmp;
+
+        }
+
+        function closeDiv() {
+            document.getElementById("sumDiv").style.display = "none";
+        }
+
+        function ErrorM() {
+            alert("not good")
+
+        }
+
+
+        function menufun() {
+            location.replace("Menu.html"); /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+        }
+    </script>
+
+
+
+
+</head>
+<body dir="rtl">
+    <!--דיב שמיועד לבדיקת מספר ספירת המלאי-->
+        <div id="Mdiv">
+            <h2>מסך מנהל</h2>
+            <div class="container">
+                <form id="Mform" >
+                    <div><br /> <label for="RM">הזן מספר ספירת מלאי</label></div>
+                    <div>
+                        <input type="text" id="NCI" name="NCI" required>
+                    </div>
+                    <input id="SubBTN" class="btn" type="submit" value="בדיקת מספר">
+                </form>
+                <h4 id="Ccheck">בודק ספירת מלאי שמספרה </h4>
+                <div id="Certificate"></div>
+                <div id="Certificate2"></div>
+
+            </div>
+
+
+            <div class="semel">
+                <img src="semel.svg.png" />
+            </div>
+
+
+
+        </div>
+    <!--דיב של הדאטה טייבל של המנהל-->
+        <div id="MTableDiv">
+            <h2>הצגת ספירת מלאי </h2>
+            
+            <div class="container">
+                <!--<input type="button" value="הוספת חומר חדש" class="btn btn-primary btn-lg" id="newBTN" />-->
+                <form id="pForm" onsubmit="return false">
+                    <table id="checkTable" class="display nowrap" style="width:100%">
+                        <thead>
+                            <tr>
+                                
+                                <th>מקט</th>
+                                <th>סוג ייצור</th>
+                                <th>כמות במלאי</th>
+                                <th>כמות בספירה</th>
+                                <th>מספר ספירה</th>
+                                <th></th>
+
+                            </tr>
+                        </thead>
+                    </table>
+                </form>
+                <div>
+                    <button type='button' class='btn' id='NewBTN'>הוספת חומר חדש</button>
+
+                    <button type='button' class='btn' onclick='SumMaterial()' id='sumBTN'>סיכום לפריט</button>
+
+                    <button type='button' class='btn' onclick='Report()' id='repBTN'>דוח פחת</button>
+
+                    <button type='button' class='btn' onclick="AddCheck()" id='confirmBTN'>אשר ספירה</button>
+
+                    <button type='button' class='btn' onclick="window.print()" id='printBTN'>הדפס ספירה</button>
+                </div>
+
+                <div id="reportDiv">
+                    <table align='center' id='reporttable'>
+                       
+                    </table>
+                </div>
+                <div id="sumDiv"></div>
+
+                <div id="editDiv">
+                    <form id="MaterialForm" onsubmit="return false">
+                        <div class="form-group col-sm-3">
+                            <label for="materialNumber"><span class="red-star">★ </span>מקט</label>
+                            <input type="text" class="form-control" id="materialNumber" placeholder="הכנס מספר מקט" required>
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="form-group col-sm-3">
+                                <label for="productionID"><span class="red-star">★ </span>מחלקה</label>
+                                <input type="text" class="form-control" id="productionID" placeholder="הכנס סוג ייצור" required>
+                            </div>
+
+                            <div class="form-group col-sm-3">
+                                <label for="inventoryAmount"><span class="red-star">★ </span>כמות במלאי</label>
+                                <input type="text" id="inventoryAmount" class="form-control" placeholder="הכנס כמות במלאי" required />
+
+                            </div>
+
+                            <div class="form-group col-sm-3">
+                                <label for="amountInCheck"><span class="red-star">★ </span>כמות בספירה</label>
+                                <input type="text" id="amountInCheck" class="form-control" placeholder="הכנס כמות בספירה" required />
+
+                            </div>
+
+                            <div class="form-group col-sm-3">
+                                <label for="CheckNumber"><span class="red-star">★ </span>מספר ספירה</label>
+                                <input type="text" id="CheckNumber" class="form-control" placeholder="הכנס מספר ספירה" required />
+                            </div>
+
+
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">שמור</button>
+                        <input type="button" class="btn btn-warning btn-lg" id="cancelSaveBTN" value="ביטול" />
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+        <input type="button" class="btn" id="menu" onclick="menufun()" value="חזרה לתפריט" />
+
+</body>
+</html>

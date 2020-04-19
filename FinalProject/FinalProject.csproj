@@ -157,6 +157,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\ExpenditureProductsController.cs" />
+    <Compile Include="Controllers\InventoryCheckController.cs" />
     <Compile Include="Controllers\InventoryController.cs" />
     <Compile Include="Controllers\ShippingCertificatesController.cs" />
     <Compile Include="Controllers\ShippingReceivedController.cs" />
@@ -164,12 +165,16 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Amount.cs" />
+    <Compile Include="Models\CInventory.cs" />
     <Compile Include="Models\DB\DBservices.cs" />
     <Compile Include="Models\Department.cs" />
     <Compile Include="Models\Employee.cs" />
     <Compile Include="Models\Expenditure.cs" />
     <Compile Include="Models\Expenditure_Material.cs" />
+    <Compile Include="Models\InvCheck.cs" />
+    <Compile Include="Models\InvDetails.cs" />
     <Compile Include="Models\Inventory.cs" />
+    <Compile Include="Models\ManagerCheck.cs" />
     <Compile Include="Models\Material.cs" />
     <Compile Include="Models\Material_certificate.cs" />
     <Compile Include="Models\Production.cs" />
@@ -189,6 +194,8 @@
     <Content Include="Global.asax" />
     <Content Include="Pages\ExpenditureProducts.html" />
     <Content Include="Pages\img2.PNG" />
+    <Content Include="Pages\Inventorycheck.html" />
+    <Content Include="Pages\InventoryManagerCheck.html" />
     <Content Include="Pages\Menu - manager.html" />
     <Content Include="Pages\Menu.html" />
     <Content Include="Pages\semel.svg.png" />

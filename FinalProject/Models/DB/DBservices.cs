@@ -655,6 +655,209 @@ namespace FinalProject.Models.DB
 
             return command;
         }
+        ///גל
+        public List<CInventory> getinventirychecklist()
+        {
+            List<CInventory> ci = new List<CInventory>();
+            SqlConnection con = null;
+
+            try
+            {
+                con = Connect("DBConnectionString"); // create a connection to the database using the connection String defined in the web config file
+
+                String selectSTR = "SELECT GLN_Inventory.NumMaterial, GLN_Material.MaterialName, GLN_Inventory.ProductionID FROM GLN_Inventory INNER JOIN GLN_Material ON(GLN_Inventory.NumMaterial = GLN_Material.NumMaterial)";
+                SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+                // get a reader
+                SqlDataReader dr = cmd.ExecuteReader();//(CommandBehavior.CloseConnection); // CommandBehavior.CloseConnection: the connection will be closed after reading has reached the end
+                while (dr.Read())
+                {
+                    CInventory c = new CInventory();
+                    c.MaterialId = (string)(dr["NumMaterial"]);
+                    c.MaterialName = (string)(dr["MaterialName"]);
+                    c.ProductionId = (string)(dr["ProductionID"]);
+                    ci.Add(c);
+                }
+                dr.Close();
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+            return ci;
+        }
+
+        // פוסט לטבלת ספירות (מספר ספירה-תאריך ספירה-מס עובד שביצע את הספירה)
+        private String BuildInsertCommand(InvCheck Ic)
+        {
+            String command;
+
+
+            StringBuilder sb = new StringBuilder();
+            // use a string builder to create the dynamic string
+            sb.AppendFormat("Values('{0}', '{1}')", Ic.CheckDate, Ic.EmployeeNum);
+            String prefix = "INSERT INTO GLN_InventoryCheck " + "(CheckDate, EmployeeNumber) ";
+            command = prefix + sb.ToString();
+
+            return command;
+        }
+
+
+        public int InsertCheckToDB(InvCheck icheck)
+        {
+
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = Connect("DBConnectionString"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            String cStr = "";
+            try
+            {
+                cStr = BuildInsertCommand(icheck);      // helper method to build the insert string
+                cmd = CreateCommand(cStr, con);      // create the command
+                int numE = cmd.ExecuteNonQuery(); // execute the command
+                int numEffected = Convert.ToInt32(cmd.ExecuteScalar());
+
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(cStr);
+                return 0;
+                // write to log
+                throw (ex);
+            }
+
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+
+
+        }
+
+        public List<ManagerCheck> ReadList()
+        {
+            List<ManagerCheck> SRL = new List<ManagerCheck>();
+            SqlConnection con = null;
+
+            try
+            {
+                con = Connect("DBConnectionString"); // create a connection to the database using the connection String defined in the web config file
+
+                String selectSTR = "select GLN_ICheckDetailes.NumMaterial,GLN_ICheckDetailes.ProductionID,GLN_Inventory.AmountInventory,GLN_ICheckDetailes.AmountCheck,GLN_ICheckDetailes.CheckNumber from GLN_ICheckDetailes inner join GLN_Inventory ON((GLN_Inventory.NumMaterial = GLN_ICheckDetailes.NumMaterial) AND(GLN_Inventory.ProductionID = GLN_ICheckDetailes.ProductionID))";
+                SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+                // get a reader
+                SqlDataReader dr = cmd.ExecuteReader();//(CommandBehavior.CloseConnection); // CommandBehavior.CloseConnection: the connection will be closed after reading has reached the end
+
+                while (dr.Read())
+                {   // Read till the end of the data into a row
+                    ManagerCheck a = new ManagerCheck();
+
+                    a.MaterialId = (string)(dr["NumMaterial"]);
+                    a.ProductionId = (string)(dr["ProductionID"]);
+                    a.InventoryAmount = Convert.ToInt32(dr["AmountInventory"]);
+                    a.CheckAmount = Convert.ToInt32(dr["AmountCheck"]);
+                    a.CheckNumber = Convert.ToInt32(dr["CheckNumber"]);
+                    SRL.Add(a);
+                }
+                dr.Close();
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+            return SRL;
+        }
+
+
+        public int InsertDetailsToDB(InvDetails details)
+        {
+
+            SqlConnection con;
+            SqlCommand cmd;
+
+            try
+            {
+                con = Connect("DBConnectionString"); // create the connection
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+
+            String cStr = "";
+            try
+            {
+                cStr = BuildInsertCommand(details);      // helper method to build the insert string
+                cmd = CreateCommand(cStr, con);      // create the command
+                int numE = cmd.ExecuteNonQuery(); // execute the command
+                int numEffected = Convert.ToInt32(cmd.ExecuteScalar());
+
+                return numEffected;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(cStr);
+                return 0;
+                // write to log
+                throw (ex);
+            }
+
+            finally
+            {
+                if (con != null)
+                {
+                    // close the db connection
+                    con.Close();
+                }
+            }
+
+
+        }
+
+        private String BuildInsertCommand(InvDetails details)
+        {
+            String command;
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("Values({0}, '{1}' ,'{2}',{3})", details.CheckNumber, details.MaterialId, details.ProductionId, details.Amount);
+            String prefix = "INSERT INTO GLN_ICheckDetailes  " + "(CheckNumber,NumMaterial,ProductionID, AmountCheck) ";
+            command = prefix + sb.ToString();
+
+            return command;
+        }
+
 
     }
 }
