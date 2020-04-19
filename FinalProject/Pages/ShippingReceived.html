@@ -25,6 +25,7 @@
 
         function errGet(err) { console.log(err) }
         $(document).ready(function () {
+            //inventory עושה קישור מותאם לתפריט לפי תפקיד ומביאה את המלאי מטבלת
             Inventoryfun();
             mode = "";
 
@@ -34,7 +35,7 @@
                 mode = "";
 
             });
-
+            //הוספת חומר חדש לוקח את התעודת משלוח מהלוקל
             $("#newBTN").on("click", function () {
 
                 mode = "new";
@@ -60,13 +61,11 @@
 
             //$("#saveBTN").submit(onSubmitFunc);
 
-
-
             //$("#saveBTN").on("click", function () {
             //    onSubmitFunc();
             //});
         });
-
+          //inventory עושה קישור מותאם לתפריט לפי תפקיד ומביאה את המלאי מטבלת
         function Inventoryfun() {
             let rolenum = localStorage["RoleNum"];
             if (rolenum == 10)
@@ -75,10 +74,11 @@
 
             ajaxCall("GET", "../api/Inventory", "", InvySuccess, error);
         }
-
+        //שומרת את טבלת מלאי
         function InvySuccess(data) {
             Inventorylist = data;
         }
+         //מחזירה רשימה של רשומות ששייכות לתעודת משלוח הרלוונטית 
         function Certificatecheck(material) {
             Certificatematerial = [];
             i = 0;
@@ -89,9 +89,8 @@
             }
             return Certificatematerial;
         }
-
+        //מקבל את התעודות משלוח ומכניס לדאטה טייבל
         function succGet(materialData) {
-
 
             btnlist = [];
             material = materialData;
@@ -105,7 +104,7 @@
                             render: function (data, type, row, meta) {
                                 let materialD = "material-Id='" + row.NumMaterial + "'";
 
-                                editBtn = "<button type='button' class = 'editBtn btn btn-success' id='" + row.NumMaterial + row.ProductionID + "'" + materialD + "onclick='look(this)'> עריכה </button>";
+                                editBtn = "<button type='button' class = 'editBtn btn btn-success' id='" + row.NumMaterial + row.ProductionID + "'" + materialD + "onclick='lock(this)'> עריכה </button>";
                                 viewBtn = "<button type='button' class = 'viewBtn btn btn-info' " + materialD + "> צפייה </button>";
 
                                 return editBtn + viewBtn;
@@ -124,7 +123,6 @@
                         { data: "NumMaterial" },
                         { data: "ShippingCertificate" }
 
-
                     ],
                 });
                 buttonEvents();
@@ -136,7 +134,8 @@
         }
         x = 0;
         btnid = [];
-        function look(btn) {
+        //מבצע נעילה ברגע שנלחץ על כפתור עריכה
+        function lock(btn) {
 
             btnid[x++] = btn.id;
 
