@@ -65,12 +65,14 @@
             //    onSubmitFunc();
             //});
         });
-          //inventory עושה קישור מותאם לתפריט לפי תפקיד ומביאה את המלאי מטבלת
+        //inventory עושה קישור מותאם לתפריט לפי תפקיד ומביאה את המלאי מטבלת
         function Inventoryfun() {
             let rolenum = localStorage["RoleNum"];
             if (rolenum == 10)
                 document.getElementById("menuPage").innerHTML = "<a href='Menu - manager.html'>לתפריט</a>";
             else document.getElementById("menuPage").innerHTML = "<a href='Menu.html'>לתפריט</a>";
+            document.getElementById("Invent").innerHTML = "<a href='Inventorycheck.html'>ספירת מלאי</a>";
+            document.getElementById("Expendit").innerHTML = "<a href='ExpenditureProducts.html'>הוצאת סחורה</a>";
 
             ajaxCall("GET", "../api/Inventory", "", InvySuccess, error);
         }
@@ -78,7 +80,7 @@
         function InvySuccess(data) {
             Inventorylist = data;
         }
-         //מחזירה רשימה של רשומות ששייכות לתעודת משלוח הרלוונטית 
+        //מחזירה רשימה של רשומות ששייכות לתעודת משלוח הרלוונטית
         function Certificatecheck(material) {
             Certificatematerial = [];
             i = 0;
@@ -134,7 +136,7 @@
         }
         x = 0;
         btnid = [];
-        //מבצע נעילה ברגע שנלחץ על כפתור עריכה
+        //שומר את הכפתורים שעליהם כבר לחצנו עידכון על מנת שנוכל לבצע נעילה
         function lock(btn) {
 
             btnid[x++] = btn.id;
@@ -173,7 +175,7 @@
                 btnlist[i++] = [material1.NumMaterial];
             //document.getElementById(material1.NumMaterial).disabled = true;
         }
-
+        //מחזיר את הרשומה הרלוונטית
         function getMaterial(id) {
             for (i in material) {
                 if (material[i].NumMaterial == id) {
@@ -261,7 +263,7 @@
                 ajaxCall("POST", "../api/ShippingReceived", JSON.stringify(materialtoSave1), insertSuccess, error);
             return false;
         }
-
+        //מחזיר את הכמות במלאי של חומר מסוג ייצור
         function getinv() {
             for (k in Inventorylist) {
                 if ($("#numMaterial").val() == Inventorylist[k].NumMaterial && $("#productionID").val() == Inventorylist[k].ProductionID) {
@@ -328,10 +330,14 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
+                <div id="menuPage" class="navbar-brand"></div>
+                <div id="Expendit" class="navbar-brand"></div>
+                <div id="Invent" class="navbar-brand"></div>
                 <a href="ShippingReceived.html" class="navbar-brand"> טבלת חומרים להכנסה</a>
 
                 <!--<input type="button" onclick="menufun()" class="navbar-brand" value="חזרה לתפריט" />-->
-                <div id="menuPage" class="navbar-brand"></div>
+
+
             </div>
             <!--<a href="Menu.html" id="MenuReturn" class="navbar-brand">חזרה לתפריט</a>-->
 

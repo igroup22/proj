@@ -156,6 +156,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
+    <Compile Include="Controllers\ExpenditureController.cs" />
     <Compile Include="Controllers\ExpenditureProductsController.cs" />
     <Compile Include="Controllers\InventoryCheckController.cs" />
     <Compile Include="Controllers\InventoryController.cs" />
@@ -206,6 +207,8 @@
     <Content Include="Pages\ShippingReceived.html" />
     <Content Include="Pages\background.gif" />
     <Content Include="Pages\backg.png" />
+    <Content Include="Pages\utils.js" />
+    <Content Include="Pages\ManagerPage.html" />
     <Content Include="Scripts\ajaxCalls.js" />
     <Content Include="Scripts\ajaxCallsStub.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -229,10 +232,13 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\CollectionModelDescription.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
+    <Content Include="Scripts\Chart.js" />
+    <Content Include="Scripts\Chart.min.js" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Pages\img1.gif" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="Scripts\deploy.js" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -258,6 +264,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Scripts\release.js" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

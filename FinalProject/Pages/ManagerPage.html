@@ -1,0 +1,242 @@
+<!doctype html>
+<html>
+
+<head>
+    <title></title>
+    <script src="utils.js"></script>
+    <script src="../Scripts/Chart.min.js"></script>
+    <script src="../Scripts/ajaxCalls.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <style>
+    </style>
+    <link href="style.css" rel="stylesheet" />
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load("current", { packages: ["corechart"] });
+        google.charts.setOnLoadCallback(drawChart);
+        function drawChart(data) {
+            var data = google.visualization.arrayToDataTable([
+                ['Task', 'Hours per Day'],
+                [data[0].NumMaterial + "-" + data[0].ProductionID, data[0].AmountInventory],
+                [data[1].NumMaterial + "-" + data[1].ProductionID, data[1].AmountInventory],
+                [data[2].NumMaterial + "-" + data[2].ProductionID, data[2].AmountInventory],
+                [data[3].NumMaterial + "-" + data[3].ProductionID, data[3].AmountInventory],
+                [data[4].NumMaterial + "-" + data[4].ProductionID, data[4].AmountInventory]
+          
+            ]);
+
+            var options = {
+                title: ' החומרים המובילים לפי סוג ייצור  ',
+                is3D: true,
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+            chart.draw(data, options);
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="navbar-header">
+
+        <div id="menuPage" class="n"></div>
+        <div id="ShippingReceived" class="n"></div>
+        <div id="Invent" class="n"></div>
+        <div id="InventM" class="n"></div>
+        <div id="Expendit" class="n"></div>
+        <div id="NewEmp" class="n"></div>
+    </div>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+
+        <!--פאי-->
+        <div id="piechart_3d"></div>
+        <!--פאי-->
+   
+        <button class="gropbtn" id="randomizeData">Randomize Data</button>
+        <button class="gropbtn" id="addDataset">Add Dataset</button>
+        <button class="gropbtn" id="removeDataset">Remove Dataset</button>
+        <button class="gropbtn" id="addData">Add Data</button>
+        <button class="gropbtn" id="removeData">Remove Data</button>
+    </div>
+    <div class="semel">
+        <img src="semel.svg.png" />
+    </div>
+    <script>
+        var MONTHSR = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        var color = Chart.helpers.color;
+
+
+        window.onload = function () {
+            fun1();
+            ajaxCall("GET", "../api/ShippingCertificates", "", succGet1, errGet);
+            ajaxCall("GET", "../api/Expenditure", "", succGet2, errGet);
+            ajaxCall("GET", "../api/Inventory", "", succGet3, errGet);
+            var ctx = document.getElementById('canvas').getContext('2d');
+            window.myBar = new Chart(ctx, {
+                type: 'bar',
+                data: barChartData,
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Manager Bar Chart'
+                    }
+                }
+            });
+
+        };
+        function succGet2(data) { console.log(data); }
+        function succGet3(data) {
+            console.log(data);
+            drawChart(data);}
+        function fun1() {
+
+            document.getElementById("menuPage").innerHTML = "<a href='Menu - manager.html'>לתפריט</a>";
+            document.getElementById("ShippingReceived").innerHTML = "<a href='ShippingReceived.html'>קבלת סחורה</a>";
+            document.getElementById("Invent").innerHTML = "<a href='Inventorycheck.html'>ספירת מלאי</a>";
+            document.getElementById("Expendit").innerHTML = "<a href='ExpenditureProducts.html'>הוצאת סחורה</a>";
+            document.getElementById("InventM").innerHTML = "<a href='InventoryManagerCheck.html'>ספירת מלאי - מנהל</a>";
+            document.getElementById("NewEmp").innerHTML = "<a href='NewEmployee.html'>הוספת עובד</a>";
+        }
+        function succGet1(data) {
+            console.log(data);
+            for (var i = 0; i < data.length; i++) {
+
+                var dateCer = data[i].DateReceive.split("/");
+
+                var monthc = dateCer[1];
+                switch (monthc) {
+
+                    case 1:
+                        MONTHSR[0] = MONTHSR[0] + 1;
+                        break;
+                    case 2:
+                        MONTHSR[1]++
+                        break;
+                    case '3':
+                        MONTHSR[2] = MONTHSR[2] + 1;
+                        break;
+                    case '4':
+                        MONTHSR[3] = MONTHSR[3] + 1;
+                        break;
+                    case '5':
+                        MONTHSR[4] = MONTHSR[4] + 1;
+                        break;
+                    case '6':
+                        MONTHSR[5] = MONTHSR[5] + 1;
+                        break;
+                    case '7':
+                        MONTHSR[6] = MONTHSR[6] + 1;
+                        break;
+                }
+                window.myBar.update();
+            }
+
+        }
+        function errGet(err) { console.log(err); }
+        var barChartData = {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            datasets: [{
+                label: 'Shipping Certificate',
+                backgroundColor: color(window.chartColors.red).alpha(0.5).rgbString(),
+                borderColor: window.chartColors.red,
+                borderWidth: 1,
+                data: [
+                    MONTHSR[0],
+                    MONTHSR[1],
+                    MONTHSR[2],
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                    randomScalingFactor()
+                ]
+            }, {
+                label: 'Expenditure',
+                backgroundColor: color(window.chartColors.blue).alpha(0.5).rgbString(),
+                borderColor: window.chartColors.blue,
+                borderWidth: 1,
+                data: [
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                    randomScalingFactor(),
+                    randomScalingFactor()
+                ]
+            }]
+
+        };
+
+
+
+
+        document.getElementById('randomizeData').addEventListener('click', function () {
+            var zero = Math.random() < 0.2 ? true : false;
+            barChartData.datasets.forEach(function (dataset) {
+                dataset.data = dataset.data.map(function () {
+                    return zero ? 0.0 : randomScalingFactor();
+                });
+
+            });
+            window.myBar.update();
+        });
+
+        var colorNames = Object.keys(window.chartColors);
+        document.getElementById('addDataset').addEventListener('click', function () {
+            var colorName = colorNames[barChartData.datasets.length % colorNames.length];
+            var dsColor = window.chartColors[colorName];
+            var newDataset = {
+                label: 'Shipping Certificate ' + (barChartData.datasets.length + 1),
+                backgroundColor: color(dsColor).alpha(0.5).rgbString(),
+                borderColor: dsColor,
+                borderWidth: 1,
+                data: []
+            };
+
+            for (var index = 0; index < barChartData.labels.length; ++index) {
+                newDataset.data.push(randomScalingFactor());
+            }
+
+            barChartData.datasets.push(newDataset);
+            window.myBar.update();
+        });
+
+        document.getElementById('addData').addEventListener('click', function () {
+            if (barChartData.datasets.length > 0) {
+                var month = MONTHS[barChartData.labels.length % MONTHS.length];
+                barChartData.labels.push(month);
+
+                for (var index = 0; index < barChartData.datasets.length; ++index) {
+                    barChartData.datasets[index].data.push(randomScalingFactor());
+                }
+
+                window.myBar.update();
+            }
+        });
+
+        document.getElementById('removeDataset').addEventListener('click', function () {
+            barChartData.datasets.pop();
+            window.myBar.update();
+        });
+
+        document.getElementById('removeData').addEventListener('click', function () {
+            barChartData.labels.splice(-1, 1); // remove the label first
+
+            barChartData.datasets.forEach(function (dataset) {
+                dataset.data.pop();
+            });
+
+            window.myBar.update();
+        });
+    </script>
+</body>
+
+</html>

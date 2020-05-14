@@ -105,7 +105,7 @@ namespace FinalProject.Models.DB
             }
             return SRL;
         }
-        
+
         private SqlCommand CreateCommand(String CommandSTR, SqlConnection con)
         {
 
@@ -799,8 +799,48 @@ namespace FinalProject.Models.DB
             }
             return SRL;
         }
+        public List<Expenditure> returnexp()
+        {
+            List<Expenditure> exp = new List<Expenditure>();
+            SqlConnection con = null;
 
+            try
+            {
+                con = Connect("DBConnectionString"); // create a connection to the database using the connection String defined in the web config file
 
+                String selectSTR = "select * from GLN_Expenditure";
+                SqlCommand cmd = new SqlCommand(selectSTR, con);
+
+                // get a reader
+                SqlDataReader dr = cmd.ExecuteReader();//(CommandBehavior.CloseConnection); // CommandBehavior.CloseConnection: the connection will be closed after reading has reached the end
+
+                while (dr.Read())
+                {   // Read till the end of the data into a row
+                    Expenditure a = new Expenditure();
+
+               
+                    a.ExpenditureNum = Convert.ToInt32(dr["ExpenditureNum"]);
+                    a.ExpenditureDate = (string)(dr["ExpenditureDate"]);
+                    a.EmployeeNum = (string)(dr["EmployeeNum"]);
+                    a.ProductionID = (string)(dr["ProductionID"]);
+                    exp.Add(a);
+                }
+                dr.Close();
+            }
+            catch (Exception ex)
+            {
+                // write to log
+                throw (ex);
+            }
+            finally
+            {
+                if (con != null)
+                {
+                    con.Close();
+                }
+            }
+            return exp;
+        }
         public int InsertDetailsToDB(InvDetails details)
         {
 

@@ -5,7 +5,9 @@
     <link href="style.css" rel="stylesheet" />
 
 </head>
+
 <body dir="rtl">
+
     <h3>הוספת עובד</h3>
 
     <div class="container">
@@ -37,6 +39,7 @@
 
         <input id="sub" type="submit" value="אישור">
     </div>
+    <div id="menuPage" class="n"></div>
     <div class="semel">
         <img src="semel.svg.png" />
     </div>
@@ -47,6 +50,7 @@
         <p id="number" class="invalid">A <b>number</b></p>
         <p id="length" class="invalid">Minimum <b>8 characters</b></p>
     </div>
+
     <!------------------------------------------------------->
 
     <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
@@ -121,6 +125,7 @@
 
         //-------------------------------------------------------------------------------
         $(document).ready(function () {
+            document.getElementById("menuPage").innerHTML = "<a href='Menu - manager.html'>לתפריט</a>";
             console.log("doc is ready");
             $("#sub").click(f1);
             //$("#form").submit(f1);

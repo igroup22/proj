@@ -1,22 +1,33 @@
 ﻿body {
     background-image: url("img2.PNG");
     background-size: cover;
-
     text-align: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
     font-family: 'Segoe UI';
 }
+
 .semel img {
     height: 70px;
     width: 200px;
     border-radius: 8px;
     opacity: 0.5;
- 
     margin-right: 1000px;
     margin-top: 100px;
 }
+#piechart_3d {
+
+    height: 400px;
+    float: left;
+    opacity: 0.6;
+    width: 400px;
+}
+.gropbtn {
+    width: 60px;
+    font-size:10px;
+}
+
 .semelLogin img {
     height: 70px;
     width: 200px;
@@ -30,7 +41,8 @@ select {
     border: 1px solid black;
     border-radius: 4px;
 }
-#menuPage1 a {
+
+#menuPage a {
     direction: rtl;
     color: #5e5e5e;
     text-align: center;
@@ -41,17 +53,6 @@ select {
     left: 0px;
     right: 0px;
     margin-left: 625px;
-}
-    #menuPage1 a:hover {
-        background: #ddd;
-        border: 1px solid #5e5e5e;
-        border-radius: 4px;
-        color: #5e5e5e
-    }
-
-
-
-#menuPage a {
     margin-left: 15px;
     color: #5e5e5e;
     text-align: center;
@@ -61,31 +62,66 @@ select {
     margin-left: 15px;
     border: 1px solid #5e5e5e;
 }
-    #menuPage a:hover {
+
+a {
+    direction: rtl;
+    color: #5e5e5e;
+    text-align: center;
+    padding: 11px 11px;
+    border: 1px solid #5e5e5e;
+    border-radius: 4px;
+    border: 1px solid #5e5e5e;
+    left: 0px;
+    right: 0px;
+    margin-left: 625px;
+    margin-left: 15px;
+    margin-left: 15px;
+
+}
+
+    a:hover {
         background: #ddd;
         border: 1px solid #5e5e5e;
         border-radius: 4px;
         color: #5e5e5e
     }
+
+
+ #canvas {
+    width: 350px;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    float: left;
+}
 /*/*/
 /* Links inside the navbar */
 .navbar a {
     /*display: block;*/
-    color: #f2f2f2;
+    /*color: #f2f2f2;*/
     text-align: center;
-    padding: 14px 16px;
+    padding: 10px 16px;
     text-decoration: none;
     border: 1px solid #808080;
-
     border-radius: 4px;
-    margin-left: 15px;
+    margin-left: 0.5px;
+    margin-right: 0.5px;
 }
-        /* Change background on mouse-over */
-        .navbar a:hover {
-            background: #ddd;
-         border: 1px solid black;
+/*עיצוב טבלאת מנהל*/
+#container {
+    width: 60%;
+    padding-top: 20px;
+}
+.n a {
+    float: left;
+    margin-bottom: 20px;
+}
+/* Change background on mouse-over */
+.navbar a:hover {
+    background: #ddd;
+    border: 1px solid black;
     border-radius: 4px;
-        }
+}
 
 -->
 <!-- /* Main content */
@@ -110,7 +146,6 @@ select {
     text-align: center;
     padding-bottom: 0px;
     padding-top: 0px;
-
 }
 
 
@@ -135,8 +170,8 @@ input {
     box-sizing: border-box;
     margin-top: 6px;
     margin-bottom: 16px;
-  
 }
+
 #jobnum {
     font-family: 'Segoe UI';
     text-align: center;
@@ -150,6 +185,7 @@ input {
     font-size: 15px;
     text-align: right;
 }
+
 option {
     text-align: right;
 }
@@ -163,6 +199,7 @@ input[type=submit] {
     font-family: 'Segoe UI';
     /*}*/
 }
+
 #cancelSaveBTN {
     text-align: center;
     background-color: red;
@@ -184,7 +221,7 @@ input[type=submit] {
     .container {
     text-align: center;
     /*background-color: #f1f1f1;*/
-    /*padding: 20px;*/
+/*padding: 20px;*/
 /*}*/
 
 /* The message box is shown when the user clicks on the password field */
@@ -243,20 +280,20 @@ input[type=submit] {
     width: 30%; /* Full width */
 }
 
-/* Links inside the navbar */
-.menuclass a {
-    display: block;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-}
-
-    /* Change background on mouse-over */
-    .menuclass a:hover {
-        background: #ddd;
-        color: black;
+    /* Links inside the navbar */
+    .menuclass a {
+        display: block;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px 16px;
+        text-decoration: none;
     }
+
+        /* Change background on mouse-over */
+        .menuclass a:hover {
+            background: #ddd;
+            color: black;
+        }
 
 /* Main content */
 .main {
