@@ -22,6 +22,15 @@ namespace FinalProject.Controllers
             //return null;
         }
 
+        // GET api/<controller>
+        [HttpGet]
+        [Route("api/ExpenditureProducts/returnExM")]
+        public List<Expenditure_Material> Get(string mispar)
+        {
+            Expenditure_Material ex = new Expenditure_Material();
+            return ex.returnExM(mispar);
+        }
+
         // GET: api/ExpenditureProducts/5
         public List<Inventory> Get()
         {
@@ -34,7 +43,7 @@ namespace FinalProject.Controllers
 
         {
             Expenditure e = new Expenditure();
-          return  e.insert(expenditure);
+            return e.insert(expenditure);
         }
 
         [HttpPost]

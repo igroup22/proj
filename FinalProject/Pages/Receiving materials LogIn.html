@@ -17,69 +17,70 @@
             </div>
             <input id="sub" type="submit" value="אישור">
         </form>
+
         <h4 id="Ccheck">?האם זו ההזמנה</h4>
-        <div id="Certificate"></div>
-        <div id="Certificate2"></div>
+            <div id="Certificate"></div>
+            <div id="Certificate2"></div>
 
     </div>
 
 
-    <div class="semel">
-        <img src="semel.svg.png" />
-    </div>
+        <div class="semel">
+            <img src="semel.svg.png" />
+        </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
-    <!--<script src="jquery-3.4.1.min.js"></script>-->
-    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.4.1.min.js"></script>
+        <!--<script src="jquery-3.4.1.min.js"></script>-->
+        <script src="../Scripts/jquery-3.3.1.min.js"></script>
 
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+                integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+                crossorigin="anonymous"></script>
 
-    <script src="../Scripts/ajaxCalls.js"></script>
-
-
-    <script>
-        var myInput = document.getElementById("RMN");
+        <script src="../Scripts/ajaxCalls.js"></script>
 
 
-        $(document).ready(function () {
-
-            console.log("doc is ready");
-            $("#form").submit(f1);
-           
-
-        });
+        <script>
+            var myInput = document.getElementById("RMN");
 
 
-        function f1() {
+            $(document).ready(function () {
 
-            ajaxCall("GET", "../api/ShippingCertificates", "", getSuccsessM, getErrorM);
-            return false;
-        }
+                console.log("doc is ready");
+                $("#form").submit(f1);
 
-        function getSuccsessM(data) {
-            console.log(data);
-            RMN1 = $("#RMN").val();
-            for (x in data)
-                if (RMN1 == data[x].ShippingCertificate) {
-                    document.getElementById("Certificate").innerHTML = data[x].ShippingCertificate;
-                    document.getElementById("Ccheck").style.visibility = 'visible';
-                    document.getElementById("Certificate2").innerHTML = "<a href='ShippingReceived.html'>לביצוע הכנסת מלאי</a>";
-                    localStorage["ShippingCertificate"] = RMN1;
-                    break;
-                }
-                else {
-                    str = "ההזמנה לא נמצאה";
-                    document.getElementById("Certificate").innerHTML = str;
-                }
-        }
-        function getErrorM(err) {
-            console.log(err);
 
-        }
-    </script>
+            });
+
+
+            function f1() {
+
+                ajaxCall("GET", "../api/ShippingCertificates", "", getSuccsessM, getErrorM);
+                return false;
+            }
+
+            function getSuccsessM(data) {
+                console.log(data);
+                RMN1 = $("#RMN").val();
+                for (x in data)
+                    if (RMN1 == data[x].ShippingCertificate) {
+                        document.getElementById("Certificate").innerHTML = data[x].ShippingCertificate;
+                        document.getElementById("Ccheck").style.visibility = 'visible';
+                        document.getElementById("Certificate2").innerHTML = "<a href='ShippingReceived.html'>לביצוע הכנסת מלאי</a>";
+                        localStorage["ShippingCertificate"] = RMN1;
+                        break;
+                    }
+                    else {
+                        str = "ההזמנה לא נמצאה";
+                        document.getElementById("Certificate").innerHTML = str;
+                    }
+            }
+            function getErrorM(err) {
+                console.log(err);
+
+            }
+        </script>
 
 </body>
 </html>

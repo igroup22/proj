@@ -7,8 +7,37 @@
     background-size: cover;
     font-family: 'Segoe UI';
 }
+#tafrit div{
+    margin-left:20px;
+    margin-top:10px;
+}
+.btn {
+    background-color: lightgrey;
+    border-radius: 6px;
+    text-align: center;
+    transition-duration: 0.4s;
+    border: 1px solid black;
+    margin-top: 10px;
+    margin-right: 5px;
+    height: 30px;
+}
+
+    .btn:hover {
+        background-color: darkgrey;
+        color: white;
+    }
+div.solid {
+    border-style: solid;
+    height: 300px;
+    width:450px;
+    margin: 350px;
+    position:absolute;
+    top:-300px;
+    /*float:left;*/
+}
 
 .semel img {
+    position:static;
     height: 70px;
     width: 200px;
     border-radius: 8px;
@@ -27,7 +56,12 @@
     width: 60px;
     font-size:10px;
 }
-
+.empty {
+    background-color: red;
+}
+.full {
+    background-color: aquamarine;
+}
 .semelLogin img {
     height: 70px;
     width: 200px;
@@ -131,7 +165,6 @@ a {
 
 
 
-
 .colorDiv {
     height: 30px;
     width: 70px;
@@ -139,7 +172,7 @@ a {
 }
 
 #newBTN {
-    background-color: aliceblue;
+    background-color:#ddd;
     margin-bottom: 10px;
     color: black;
     font-size: 15px;
@@ -148,28 +181,24 @@ a {
     padding-top: 0px;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 /* style login*/
 input {
     text-align: center;
     height: 25px;
-    border: 1px solid black;
-    border-radius: 4px;
-    border-radius: 4px;
+    border-radius: 6px;
     box-sizing: border-box;
     margin-top: 6px;
     margin-bottom: 16px;
+    border: 1px solid black;
+}
+input{
+    text-align: center;
+    height: 25px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    border: 1px solid black;
 }
 
 #jobnum {
@@ -184,6 +213,7 @@ input {
     margin-bottom: 16px;
     font-size: 15px;
     text-align: right;
+
 }
 
 option {
@@ -194,10 +224,26 @@ input[type=submit] {
     text-align: center;
     background-color: #ddd;
     color: black;
+    /*opacity: 0.4;*/
+    transition-duration: 0.4s;
+    width: 100px;
+    font-family: 'Segoe UI';
+    border: 1px solid black;
+}
+#Certificate2 a {
+    text-align: center;
+    background-color: #ddd;
+    color: black;
     opacity: 0.7;
     width: 100px;
     font-family: 'Segoe UI';
-    /*}*/
+    font-size: 13px;
+    height: 25px;
+    border: 1px solid black;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
 }
 
 #cancelSaveBTN {
@@ -205,8 +251,8 @@ input[type=submit] {
     background-color: red;
     color: white;
     opacity: 0.7;
-    height: 45px;
-    margin-bottom: 5px;
+    height: 48px;
+    margin-bottom: 15px;
     font-family: 'Segoe UI';
     padding: 10px 16px;
     font-size: 18px;
@@ -214,7 +260,7 @@ input[type=submit] {
     border-radius: 6px;
     vertical-align: middle;
 }
-/*}*/
+/*}
 
 
 /* Style the container for inputs 
@@ -274,10 +320,10 @@ input[type=submit] {
     font-family: 'Segoe UI';
     font-size: 20px;
     overflow: hidden;
-    background-color: #333;
+    background-color: black;
     position: fixed; /* Set the navbar to fixed position */
-    top: 0; /* Position the navbar at the top of the page */
-    width: 30%; /* Full width */
+    top: 0px; /* Position the navbar at the top of the page */
+    width: 20%; /* Full width */
 }
 
     /* Links inside the navbar */
@@ -285,7 +331,7 @@ input[type=submit] {
         display: block;
         color: #f2f2f2;
         text-align: center;
-        padding: 14px 16px;
+        padding: 10px 16px;
         text-decoration: none;
     }
 
@@ -314,15 +360,12 @@ input[type=submit] {
 #Certificate {
     margin-bottom: 17px;
     padding-bottom: 15px;
+    
 }
 
 
+
 /*login certificate Receiving*/
-
-
-
-
-
 
 
 /*add employee*/

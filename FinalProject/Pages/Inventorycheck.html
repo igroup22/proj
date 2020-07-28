@@ -5,15 +5,14 @@
     <title>Inventory Check</title>
 
     <meta charset="utf-8" />
-    <link href="style.css" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
-
-
+    <link href="style.css" rel="stylesheet" />
     <script src="../Scripts/ajaxCalls.js"></script>
 
     <!--מה שבני הוסיף בתרגיל כיתה-->
@@ -26,7 +25,7 @@
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
             integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>   
+            crossorigin="anonymous"></script>
 
     <script src="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"></script>
     <script src="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css"></script>
@@ -79,20 +78,20 @@
             margin-top: 15px;
         }
 
-        .new{
-            background-color:lightcoral;
+        .new {
+            background-color: lightcoral;
         }
     </style>
 
     <script>
-        // צריך לעשות כאן בדיקה לפי מספר העובד שנכנס -
-        //אם הוא מנהל אז להציג לו את הדיב של המנהל עם הדאטה טייבל - אם לא אז להציג לו את של העובד
+
 
         var MaterialList;
         var str = "";
         var check = 0;
         var employeenum;
         var z = 0;
+        counter = 0;
 
 
         $(document).ready(function () {
@@ -105,7 +104,7 @@
 
         });
 
-        $("#saveBTN").click(onSubmitFunc);
+        //$("#saveBTN").click(onSubmitFunc);
 
         function onLoad() {
             //employeenum = localStorage["employeenum"];
@@ -125,7 +124,7 @@
 
             document.getElementById("details").innerHTML = strDANDE;
 
-            
+
         }
 
         //מביאה את רשימת החומרים מהדאטה בייס
@@ -165,7 +164,6 @@
             onSubmitFunc();
         });
 
-        //$("#saveBTN").click(onSubmitFunc);
 
         function SumMaterial() {
             var x = document.getElementById("sumDiv");
@@ -200,7 +198,7 @@
 
             SUMstr += "<table align='center' id='sumtable'></table>";
 
-            SUMstr += "<br/><button type='button' class='btn' onclick='closeDiv()' id='closeBTN'>סגור</button>";
+            SUMstr += "<br/><button type='button' class='btn' onclick='closeDiv()' id='closeBTN'>אשר</button>";
 
 
             document.getElementById("sumDiv").innerHTML = SUMstr;
@@ -209,23 +207,25 @@
 
 
         }
+        var show;
 
         function ShowSum() {
             show = ($("#makatid").val());
 
             var Stmp = "";
 
-
-
+            Stmp += "<tr><th>שם החומר</th><th>מחלקה</th><th>כמות במלאי</th></tr>";
             for (var k = 0; k < MaterialList.length; k++) {
                 if (MaterialList[k].MaterialId == show) {
                     ltmp = MaterialList[k].MaterialId;
                     ltmp += MaterialList[k].ProductionId;
                     var l = document.getElementById(ltmp).value;
+
                     Stmp += "<tr><td>" + MaterialList[k].MaterialName + "</td>";
                     Stmp += "<td>" + MaterialList[k].ProductionId + "</td>";
 
-                    Stmp += "<td>" + l + "</td></tr>";
+                    Stmp += "<td><input type='text' id='M" + k + "' value='" + l + "' ></td></tr>";
+
                 }
             }
 
@@ -240,7 +240,7 @@
             tmpname = document.getElementById("Mname").value;
             tmpPid = document.getElementById("Pid").value;
             tmpval = document.getElementById("Mamount").value;
-             
+
             str2 += "<tr class='new'><td>" + tmpid + "</td>";
             MaterialList[z].MaterialId = tmpid;
             str2 += "<td>  " + tmpname + "  </td>";
@@ -266,57 +266,79 @@
         }
 
         function closeDiv() {
+
+            for (var p = 0; p < MaterialList.length; p++) {
+                if (MaterialList[p].MaterialId == show) {
+                    makat2 = "M" + p;
+                    mid = document.getElementById("" + makat2 + "").value;
+
+                    makat1 = "#" + MaterialList[p].MaterialId + MaterialList[p].ProductionId;
+                    $("" + makat1 + "").val(mid);
+
+
+                }
+
+            }
+
             document.getElementById("sumDiv").style.display = "none";
         }
 
         function AddCheck() {
-            let employeenum = localStorage["employeenum"];
-            
+            if (counter == 0) {
 
-            d = new Date().getDate();
-            m = new Date().getMonth() + 1; //פונקציה שמתחילה מ0-ינואר
-            y = new Date().getFullYear();
+                let employeenum = localStorage["employeenum"];
 
-            NewICheck = {
-                "CheckDate": d + "/" + m + "/" + y, //תאריך נוכחי
-                "EmployeeNum": employeenum //לוקל סטורג
+
+                d = new Date().getDate();
+                m = new Date().getMonth() + 1; //פונקציה שמתחילה מ0-ינואר
+                y = new Date().getFullYear();
+
+                NewICheck = {
+                    "CheckDate": d + "/" + m + "/" + y, //תאריך נוכחי
+                    "EmployeeNum": employeenum //לוקל סטורג
+                }
+
+                ajaxCall("PUT", "../api/InventoryCheck/InsertNewCheck", JSON.stringify(NewICheck), SCheck, ECheck)
+                counter = 3;
+            }
+            else {
+                alert("already sent :)")
             }
 
-            ajaxCall("POST", "../api/InventoryCheck/InsertNewCheck", JSON.stringify(NewICheck), SCheck, ECheck)
 
         }
 
-        // רושם פעמיים בטבלה ומחזיר אקסקיוט סקלאר שווה לאפס
+
         function SCheck(data) {
-            alert("post ok")
+            console.log("Put ok");
             console.log(data); //מספר ספירה שחזר מהאקסקיוט סקאלר
 
             //כרגע שמת את שתי השורות האלה בהערה בשביל שנוכל להראות לבני איך זה עובד, אבל בגלל שזה לא מעדכן נכון
-            // בדאטה בייס , אז כרגע שמתי סתם ערכים שימשיך לעבוד. 
+            // בדאטה בייס , אז כרגע שמתי סתם ערכים שימשיך לעבוד.
             //Ncheck = data;
             //localStorage["CheckNumber"] = data;
 
-            localStorage["CheckNumber"] = 20;
-            Ncheck = 35;
-            for (var k = 0; k < z; k++) {
+            localStorage["CheckNumber"] = data;
+            Ncheck = data;
+            for (var k = 0; k < MaterialList.length; k++) {
                 inputid = "";
                 inputid = MaterialList[k].MaterialId;
                 inputid += MaterialList[k].ProductionId;
                 A = Ncheck;
-                    B = MaterialList[k].MaterialId;
-                    C = MaterialList[k].ProductionId;
-                    D = ($("#" + inputid).val());
+                B = MaterialList[k].MaterialId;
+                C = MaterialList[k].ProductionId;
+                D = ($("#" + inputid).val());
 
                 let RowToSave = {
-                    CheckNumber:A,
-                    MaterialId:B,
-                    ProductionId:C,
-                    Amount:D,
+                    CheckNumber: A,
+                    MaterialId: B,
+                    ProductionId: C,
+                    Amount: D,
                 }
-                // כאן יהיה הפוסט השניה בשביל הטבלה השניה
-                ajaxCall("POST", "../api/InventoryCheck/InsertCheckDetalis", JSON.stringify(RowToSave), SDCheck, EDCheck)
+                // כאן יהיה הפוסט השני בשביל הטבלה השניה
+                ajaxCall("PUT", "../api/InventoryCheck/InsertCheckDetalis", JSON.stringify(RowToSave), SDCheck, EDCheck)
             }
-            
+
         }
 
         function SDCheck() {
@@ -334,39 +356,35 @@
 
 
         function menufun() {
-            location.replace("Menu.html"); /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+            let rolenum = localStorage["RoleNum"];
+            if (rolenum == 10) //הוא מנהל
+                location.replace("Menu - manager.html");
+            else
+                location.replace("Menu.html");
+                    /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
         }
 
 
-    </script>
+
+/**/</script>
 </head>
 
 <body dir="rtl">
     <div class="container">
         <h2> ספירת מלאי </h2>
         <div id="details"></div>
-        
-        
+
+
         <!--דיב לעובד-->
         <div id="Ediv">
             <!--<h2>מסך עובד</h2>-->
-            <div id="TBdiv">
-                <table align="center" id="maintable">
-                    <tr>
-                        <th>מק"ט</th>
-                        <th>שם חומר</th>
-                        <th>מחלקה</th>
-                        <th>כמות במלאי</th>
-                    </tr>
-                </table>
-                <button type='button' class='btn' id='addBTN'>הוספת חומר</button>
+            <button type='button' class='btn' id='addBTN'>הוספת חומר</button>
 
-                <button type='button' class='btn' onclick='SumMaterial()' id='sumBTN'>סיכום לפריט</button>
+            <button type='button' class='btn' onclick='SumMaterial()' id='sumBTN'>סיכום לפריט</button>
 
-                <button type='button' class='btn' onclick="AddCheck()" id='confirmBTN'>אשר ספירה</button>
+            <button type='button' class='btn' onclick="AddCheck()" id='confirmBTN'>אשר ספירה</button>
 
-                <button type='button' class='btn' onclick="window.print()" id='printBTN'>הדפס ספירה</button>
-            </div>
+            <button type='button' class='btn' onclick="window.print()" id='printBTN'>הדפס ספירה</button>
 
 
             <div id="newTable"></div>
@@ -396,35 +414,26 @@
             <div id="sumDiv">
 
             </div>
+
+            <div id="TBdiv">
+
+                <table align="center" id="maintable">
+                    <tr>
+                        <th>מק"ט</th>
+                        <th>שם חומר</th>
+                        <th>מחלקה</th>
+                        <th>כמות במלאי</th>
+                    </tr>
+                </table>
+
+            </div>
+
+
         </div>
-        <!--דיב למנהל-->
-        <!--<div id="Mdiv">
-            <h2>מסך מנהל</h2>
-            <div class="container">
-                <form id="Mform" action="/action_page.php">
-                    <div><br/> <label for="RM">הזן מספר ספירת מלאי</label></div>
-                    <div>
-                        <input type="text" id="NCI" name="NCI" required>
-                    </div>
-                    <input id="SubBTN" class="btn" type="submit" value="אישור">
-                </form>
-                <h4 id="Icheck">?האם זו ההזמנה</h4>
-                <div id="Mcheck"></div>
-                <div id="Mcheck2"></div>
 
-            </div>
-
-
-            <div class="semel">
-                <img src="semel.svg.png" />
-            </div>
-
-
-
-        </div>-->
         <input type="button" class="btn" id="menu" onclick="menufun()" value="חזרה לתפריט" />
-          
+
     </div>
-    
+
 </body>
 </html>

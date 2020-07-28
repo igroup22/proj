@@ -38,17 +38,17 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    
+
     <script src="../Scripts/ajaxCalls.js"></script>
     <link href="style.css" rel="stylesheet" />
 
     <!--מה שבני הוסיף בתרגיל כיתה-->
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-   
+
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
-   
+
     <!------------------------------------------------------->
 
     <script>
@@ -123,16 +123,25 @@
 
         function f1() {
             CheckMyManagers();
-           
+
             return false;
         }
         function menufun() {
             location.replace("Menu.html"); /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
         }
         function CheckMyManagers() {
-            x = $("#usrnum").val();
-            ajaxCall("GET", "../api/Employee?EmployeeNum=" + x, "", getSuccsessM, getErrorM);
-            //ajaxCall("GET", "../api/Employee", "", getSuccsessM, getErrorM);
+            //NewCheck = {
+            //    "EmployeeNum": $("#usrnum").val(),
+            //    "UserPassword": $("#psw").val(),
+            //}
+            var EmployeeNum = $("#usrnum").val();
+            var UserPassword = $("#psw").val();
+            //console.log(EmployeeNum);
+            //console.log(UserPassword);
+            newApi = `../api/Employee/getemployee?EmployeeNum=${EmployeeNum}&UserPassword=${UserPassword}`;
+            //JSON.stringify(materialtoSave2)
+            ajaxCall("GET", newApi, "", getSuccsessM, getErrorM);
+
         }
         function GoMenu() {
             let employeenum = $("#usrnum").val();
@@ -153,20 +162,21 @@
 
         }
         function getSuccsessM(data) {
-            localStorage["RoleNum"] = data.RoleNum.toString();
             console.log(data);
+            console.log(data[0].RoleNum);//בדיקה שלי
+            localStorage["RoleNum"] = data[0].RoleNum;
             validM = false;
-            if ($("#psw").val() != data.UserPassword) {
+            if ($("#psw").val() != data[0].UserPassword) {
                 document.getElementById("form").reset();
                 document.getElementById("x").innerHTML = "סיסמא שגויה אנא נסה שנית";
             }
             else {
-                if (data.RoleNum == 10) { GoMenuM(); }
+                if (data[0].RoleNum == 10) { GoMenuM(); }
                 else GoMenu();
             }
         }
         function getErrorM(data) {
-           
+
             console.log(data);
         }
 

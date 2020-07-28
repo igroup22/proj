@@ -42,12 +42,11 @@ namespace FinalProject.Models
             return db.postemp(emp);
         }
 
-        public Employee getemployee(string employeeNum)
+        public List<Employee> getemployee(string employ, string psw)
         {
-            DBservices db = new DBservices();
-            return db.getemployee(employeeNum);
+            DBservices dbs = new DBservices();
+            return dbs.getemployee(employ, psw);
         }
-
         //public List<Employee> getemployee()
         //{
         //    DBservices db = new DBservices();

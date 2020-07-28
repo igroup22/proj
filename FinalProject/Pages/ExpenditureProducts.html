@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Phone Book App</title>
+    <title>Expenditure Products</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -22,21 +22,33 @@
 
     <!--<script src="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"></script>
     <script src="https://cdn.datatables.net/select/1.3.1/css/select.dataTables.min.css"></script>-->
-
+    <style>
+        #menu {
+            margin-top: 15px;
+            margin-left: -1100px;
+        }
+    </style>
 
     <script>
 
+        arr = [];
+        l = 0;
+
+        mispar = "";
+        saman = 0;
         $(document).ready(function () {
-            GetNumMaterialList();
-            getinventory();
-            $("#productForm").submit(f1);
-            Inventoryfun();
+            ajaxCall("GET", "../api/Material", "", succGet3, errGet)
+            ajaxCall("GET", "../api/Zone", "", succGet4, errGet)
+            GetNumMaterialList(); //רשימה נגללת של המקטים בגאט
+            getinventory(); //להביא בגאט את הטבלה של המלאי
+            $("#productForm").submit(f1); //סבמיט על הפורם וקריאה לF1
+            Inventoryfun(); //בדיקה של כפתור חזרה לתפריט - אם הוא מנהל או לא
         });
 
-        var NumMaterialList;
+        var NumMaterialList; //משתנה של רשימה נגללת
+        var Inventorylist; //משתנה של המלאי
         function f1() {
-            AddExpenditure();
-
+            AddExpenditure(); //פוסט ראשון הוספה לטבלת הוצאה כאשר לוחצים על שגר למחסן
             return false;
         }
         function getinventory() {
@@ -49,7 +61,7 @@
         }
         function GErrE(err) { alert(err) }
 
-        function GetNumMaterialList() {
+        function GetNumMaterialList() { //גאט שמביא לי את כל המקטים לטובת רשימה נגללת
 
             ajaxCall("GET", "../api/ExpenditureProducts/NumMaterialList", "", GETNumMaterialSuccess, GETNumMaterialError)
         }
@@ -66,31 +78,46 @@
             //    x.add(option);
             AddMaterial();
         }
-        function AddMaterial() {
+        function AddMaterial() { //בניה דינמית של כפתור מקט וכמות
+            //let AmountInventory = localStorage["AmountInventory"];
+            let productionID = localStorage["productionID"]; //הוספת סוג ייצור מהלוקל סטורג מדף לוגאין
             var str = "";
             str += "<div>";
             str += "מקט פנימי:"
-            str += "<select id='M" + i + "' required> <option value=''>בחר מקט</option>";
+            str += "<select id='M" + i + "' required onchange='Inventory(this)'> <option value=''>בחר מקט</option>";
 
             for (var j = 0; j < NumMaterialList.length; j++) {
                 str += "<option value='" + NumMaterialList[j].NumMaterial + "'>" + NumMaterialList[j].NumMaterial + "</option>";
-
             }
             str += "</select > ";
             str += "כמות:"
             str += "<input type='text' id='Q" + i + "' value = ''/>";
-            str += "</div>";
             i += 1;
-            document.getElementById("MA").insertAdjacentHTML('beforeend', str);
+
+            str += "</div>";
+
+            document.getElementById("MA").insertAdjacentHTML('beforeend', str); //שיציג לי את המקט והכמות הקודמים שהזנתי שיהיה נוח למשתמש
 
             return false;
+        }
+
+        function Inventory(select) { //פונקציה שפועלת ברגע שמישהו לוחץ על המקט הרצוי - מראה כמה נשאר מאותו מקט במחסן ורק אז הוא יזין את הכמות!
+            str = "מלאי מהחומר שסומן:"
+            for (var l = 0; l < Inventorylist.length; l++) {
+
+                x = select.options[select.selectedIndex].value;
+
+                if (Inventorylist[l].NumMaterial == x && Inventorylist[l].ProductionID == localStorage["productionID"])
+                    str += " <input type ='text' id = 'L' value='נשאר " + Inventorylist[l].AmountInventory + "' /> ";
+            }
+            document.getElementById("MA").insertAdjacentHTML('beforeend', str);
         }
 
         function GETNumMaterialError() {
             alert("err")
         }
 
-        function AddExpenditure() { //הוספה לטבלת הוצאה כשלוחצים שגר למחסן
+        function AddExpenditure() { // הוספה לטבלת הוצאה כשלוחצים שגר למחסן
 
             let employeenum = localStorage["employeenum"]; //הוספת מס עובד מהלוקל סטורג מדף לוגאין
             let productionID = localStorage["productionID"]; //הוספת סוג ייצור מהלוקל סטורג מדף לוגאין
@@ -107,10 +134,13 @@
 
             ajaxCall("POST", "../api/ExpenditureProducts", JSON.stringify(NewExpenditure), POSTOrderSuccessCB, POSTOrderErrorCB)
 
+
+
         }
+
         //NewExpenditureArray;
         function POSTOrderSuccessCB(data) {
-
+            mispar = data;
             console.log(data); ///מספר הוצאה שחזר באקסיקיוט-סקאלר
 
             for (var k = 0; k < i; k++) { //k הוא משתנה שיעבור על כל הדיבים שיווצרו לפי המקט-כמות
@@ -124,22 +154,25 @@
                     "Amount": A, //כמות שהוצאתי מטבלת הוצאת סוג חומר
                 }
                 temp = 0
-                for (j in Inventorylist) {
+                for (j in Inventorylist) { //זהו משתנה שיש בתוכו את כל הדאטה של המלאי
                     if (Inventorylist[j].NumMaterial == N && Inventorylist[j].AmountInventory >= A && Inventorylist[j].ProductionID == localStorage["productionID"]) {
                         let materialtoSave2 = {
                             NumMaterial: N,
                             ProductionID: localStorage["productionID"],
                             AmountInventory: parseInt(Inventorylist[j].AmountInventory) - parseInt(A),
                         }
-                        temp = 1;
+
+
+                        temp = 1; //אם הוא 1 אז הוא עומד בכל התנאים ונעדכן!
                         ajaxCall("PUT", "../api/ExpenditureProducts", JSON.stringify(materialtoSave2), POSTOrderSuccess, POSTOrderErrorCB);
+
                     }
                 }
-                if (temp == 1) {
+                if (temp == 1) { //נעשה פוסט לטבלת הוצאת סוג חומר פוסט שני
                     //NewExpenditureArray.push(Expenditure);
                     ajaxCall("POST", "../api/ExpenditureProducts/insertMExpenditure", JSON.stringify(Expenditure), POSTOrderSuccess, POSTOrderError)
                 }
-                else {
+                else { //אם הוא לא עומד בתנאים אז נזרוק לו הודעה שאין מספיק מהחומר ונצבע באדום!
                     g = "M" + k;
                     document.getElementById(g).style.backgroundColor = "red";
                     l = "Q" + k;
@@ -150,16 +183,44 @@
 
         }
 
+        function getmaterial(m) {
+            for (var i = 0; i < arrmatiral.length; i++) {
+                if (m == arrmatiral[i].NumMaterial)
+                    return arrmatiral[i];
+            }
+        }
+
+        function succGet4(data) {
+            arrzone = data;
+        }
+        function succGet3(data) {
+            console.log(data);
+            arrmatiral = data;
+        }
+        function errGet(errGet) { console.log(errGet); }
 
         function POSTOrderErrorCB() {
             alert("Expenditure err1")
         }
 
+
+
         function POSTOrderSuccess() { //הוצאת סוג חומר
             console.log("perfect!");
             document.getElementById("productForm").innerHTML = "הוצאה בוצעה בהצלחה";
-        }
 
+            //newApi = `../api/ExpenditureProducts/returnExM?mispar=${mispar}`;
+
+            //ajaxCall("GET", newApi, "", succGet33, error);
+
+
+        }
+        //function succGet00() {
+
+
+
+
+        //}
         function POSTOrderError() { //הוצאת סוג חומר
             alert("Expenditure err2")
         }
@@ -168,11 +229,11 @@
         //}
 
         //בדיקה של כפתור חזרה לתפריט - אם הוא מנהל או לא
-             function Inventoryfun() {
-             let rolenum = localStorage["RoleNum"];
-            if (rolenum == 10)
+        function Inventoryfun() {
+            let rolenum = localStorage["RoleNum"];
+            if (rolenum == 10) //הוא מנהל
                 document.getElementById("menuPage1").innerHTML = "<a href='Menu - manager.html'>לתפריט</a>";
-            else   document.getElementById("menuPage1").innerHTML = "<a href='Menu.html'>לתפריט</a>";
+            else document.getElementById("menuPage1").innerHTML = "<a href='Menu.html'>לתפריט</a>";
 
             ajaxCall("GET", "../api/Inventory", "", InvySuccess, error);
         }
@@ -181,18 +242,141 @@
             Inventorylist = data;
         }
 
-        
+
         function error() {
-            alert ("error");
+            alert("error");
         }
 
 
+        function algo1() {
 
-    </script>
+            newApi = `../api/ExpenditureProducts/returnExM?mispar=${mispar}`;
+
+            ajaxCall("GET", newApi, "", succGet33, error);
+
+
+        }
+        function algo2() {
+
+            window.location.href = "Algoritem.html";
+        }
+
+        function checkZero(i) {
+            if (i < 10) {
+                i = "0" + i
+            };  // add zero in front of numbers < 10
+
+            return i;
+        }
+
+        function succGet33(data) {
+            for (var k = 0; k < data.length; k++) {
+                TakeZone(data[k]);
+            }
+
+        }
+        function TakeZone(data) {
+
+            j = 0;
+            var saman;
+            var check;
+            var tmpI = 0;
+            var TempExp = {
+                "Area": 4,
+                "MClassification": null,
+                "Production": null,
+                "AmountN": null,
+                "X": null,
+                "Y": null,
+                "Z": null,
+                "ID": null,
+                "ExpenditureDate": null, //תאריך ושעה נוכחיים
+            }
+
+            Tarrzone = arrzone;
+            for (var k = 0; k < data.Amount; k++) {
+                for (var i = 0; i < Tarrzone.length; i++) {
+                    saman = 0;
+                    if (Tarrzone[i].ID == data.NumMaterial)
+                        saman++;
+                    if (Tarrzone[i].Production == localStorage["productionID"])
+                        saman++;
+                    //if (i == 0) {
+
+
+
+
+
+                    //    month = checkZero(month);
+                    //    day = checkZero(day);
+
+                    //    let birthday = new Date(year, day, month)
+
+                    //    console.log(birthday);
+                    //}
+                    //if ('25/07/2020' < '01/08/2020') {
+                    //    console.log("dfrgrthrtfdghrt");
+                    //}
+                    //if (saman == 2 && Tarrzone[i].ExpenditureDate < TempDate && Tarrzone[i].ExpenditureDate != '1/1/1899') {
+
+                    if (saman == 2) {
+                        console.log("sfdsf");
+                        TempExp = {
+                            "Area": 4,
+                            "MClassification": Tarrzone[i].MClassification,
+                            "Production": null,
+                            "AmountN": null,
+                            "X": Tarrzone[i].X,
+                            "Y": Tarrzone[i].Y,
+                            "Z": Tarrzone[i].Z,
+                            "ID": null,
+                            "ExpenditureDate": null, //תאריך ושעה נוכחיים
+                        }
+                        tmpI = i;
+                        console.log(" בדיקה " + Tarrzone[i].X + i);
+                        //TempExp = Tarrzone[i];
+                    }
+
+                }
+
+                console.log("fddg");
+                let t = {
+                    "Area": 4,
+                    "MClassification": TempExp.MClassification,
+                    "Production": "",
+                    "AmountN": "",
+                    "X": TempExp.X,
+                    "Y": TempExp.Y,
+                    "Z": TempExp.Z,
+                    "ID": "",
+                    "ExpenditureDate": "", //תאריך ושעה נוכחיים
+                }
+                ajaxCall("PUT", "../api/Zone", JSON.stringify(t), updateSuccess1234, error1234);
+                Tarrzone[tmpI].ID = 1;
+
+            }
+
+
+        }
+
+        function menufun() {
+            let rolenum = localStorage["RoleNum"];
+            if (rolenum == 10) //הוא מנהל
+                location.replace("Menu - manager.html");
+            else
+                location.replace("Menu.html");
+            /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+        }
+        function error1234(err) { console.log(err) }
+        function updateSuccess1234(data) {
+            console.log(data);
+            console.log("הגיע")
+        }
+        /**/</script>
 </head>
 
 <body dir="rtl">
-
+    <input type="button" class="btn" id="menu" onclick="menufun()" value="חזרה לתפריט" />
 
     <form id="productForm">
         <div id="MA">
@@ -203,16 +387,16 @@
         <br />
         <br />
         <br />
-        <input type="submit" value="שגר למחסן" />
+        <input type="submit" class='btn' value="שגר למחסן" />
 
     </form><br />
     <!--<input type="button" onclick="menufun()" value="חזרה לתפריט" />-->
-    <div id="menuPage1" class="navbar-brand"></div><br />
-
+    <!--<div id="menuPage1" class="tafrit"></div><br />-->
+    <input type="button" class='btn' onclick="algo1()" id="algo" value="עדכון הוצאה" />
+    <input type="button" class='btn' onclick="algo2()" id="algo" value="צפה במחסן" />
     <div class="semel">
         <img src="semel.svg.png" />
     </div>
-
 
 </body>
 </html>

@@ -37,11 +37,10 @@ namespace FinalProject.Models
             DBservices db = new DBservices();
             return db.InsertExpenditureToDB(expenditure);
         }
-        public List<Expenditure> returnexp()
+        public List<Expenditure> returnExpenditure()
         {
             DBservices db = new DBservices();
-            return db.returnexp();
-
+            return db.returnExpenditure();
         }
     }
-    }
+}

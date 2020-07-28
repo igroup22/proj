@@ -13,7 +13,7 @@ namespace FinalProject.Models
         string materialClassification;
 
         DBservices dBservices;
-      
+
         public Material()
         {
             dBservices = new DBservices();
@@ -26,7 +26,7 @@ namespace FinalProject.Models
             this.idAmount = idAmount;
             this.materialClassification = materialClassification;
         }
-       
+
 
 
         public string NumMaterial { get => numMaterial; set => numMaterial = value; }

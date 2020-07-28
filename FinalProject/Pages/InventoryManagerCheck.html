@@ -34,7 +34,7 @@
     <style>
         .btn {
             background-color: lightgrey;
-            border-radius: 6px;
+            border-radius: 4px;
             text-align: center;
             transition-duration: 0.4s;
             border: 1px solid black;
@@ -54,6 +54,7 @@
         
         #menu {
             margin-top: 15px;
+            margin-left:-1100px;
         }
 
         #Ccheck {
@@ -65,6 +66,17 @@
         }
         #iii{
             padding-right:30px;
+        }
+
+        table, th, td {
+            border: 2px solid black;
+            text-align: center;
+        }
+        #saveBTN {
+            height: 47px;
+            background-color: forestgreen;
+            margin-top: -5px;
+            border-radius: 6px;
         }
 
      
@@ -86,36 +98,65 @@
         });
 
         var myInput = document.getElementById("NCI");
-
+        var ChackDate;
 
         function f1() {
-
-            ajaxCall("GET", "../api/InventoryCheckController/MCheckList", "", SuccsessM, ErrorM);
+            RMN1 = $("#NCI").val();
+            arrRMN1 = RMN1.split("-");
+            var year = arrRMN1[0];
+            var month = arrRMN1[1];
+            arrmonth = month.split("0");
+            Tmonth = arrmonth[1];
+            var day = arrRMN1[2];
+            ChackDate = day + "/" + Tmonth + "/" + year;
+            newApi = `../api/InventoryCheckController/checknumber?ChackDate=${ChackDate}`;
+            ajaxCall("GET", newApi, "", SuccsessA, ErrorM);
+            
             return false;
         }
+            
+        var Cnumber;
+        function SuccsessA(data)
+        {
+            console.log("ok")
+            console.log(data)
+            //console.log(data[0].CheckNumber);
+            
+            if (data.length != 0) {
+                Cnumber = data[0].CheckNumber;
+                ajaxCall("GET", "../api/InventoryCheckController/MCheckList", "", SuccsessM, ErrorM);
+            }
+            else if (data.length == 0)
+            {
+                str = "לא קיימת ספירת מלאי בתאריך - " + ChackDate;
+                document.getElementById("Certificate").innerHTML = str;
+            }
+        }
 
+        temp = 0;
         function SuccsessM(data) {
             console.log(data);
             MaterialList = data; // שמרנו את הרשימה שהתקבלה מהדאטה גם למשתנה גלובלי
-            RMN1 = $("#NCI").val();
+            
             for (x in data)
-                if (RMN1 == data[x].CheckNumber) {
+                if (Cnumber == data[x].CheckNumber) {
                     document.getElementById("Certificate").innerHTML = data[x].CheckNumber;
                     document.getElementById("Ccheck").style.visibility = 'visible';
                     document.getElementById("Certificate2").innerHTML = "<button type='button' class='btn' onclick='MCheckShow()' id='showBTN'>למעבר לספירת המלאי</button>";
-                    localStorage["InventoryCheckNumber"] = RMN1;
+                    localStorage["InventoryCheckNumber"] = Cnumber;
+                    localStorage.setItem("InventoryCheckNumber", Cnumber);
                     break;
                 }
-                else {
-                    str = "לא קיימת ספירת מלאי שמספרה - " + RMN1;
-                    document.getElementById("Certificate").innerHTML = str;
-                }
+               
 
             Checkmaterial = [];
             i = 0;
             for (k in MaterialList) {
-                if (localStorage["InventoryCheckNumber"] == MaterialList[k].CheckNumber)
-                    Checkmaterial[i++] = (MaterialList[k]);
+                if (localStorage["InventoryCheckNumber"] == MaterialList[k].CheckNumber) {
+                    
+                            Checkmaterial[i++] = (MaterialList[k]);
+                   
+                }
             }
 
             try {
@@ -194,9 +235,10 @@
         }
 
         function populateFields(idMarerial) {
+            let prodnum = localStorage["productionID"];
             material1 = getMaterial(idMarerial);
             $("#materialNumber").val(material1.MaterialId);
-            $("#productionID").val(material1.ProductionID);
+            $("#productionID").val(prodnum);
             $("#inventoryAmount").val(material1.InventoryAmount);
             $("#amountInCheck").val(material1.CheckAmount);
             $("#CheckNumber").val(material1.CheckNumber);
@@ -206,9 +248,9 @@
         }
 
         function getMaterial(id) {
-            for (i in material) {
-                if (material[i].MaterialId == id) {
-                    return material[i];
+            for (i in Checkmaterial) {
+                if (Checkmaterial[i].MaterialId == id) {
+                    return Checkmaterial[i];
                     break;
                 }
             }
@@ -246,12 +288,13 @@
 
         function Report() {
             var tmp = "";
-            var Cnumber = localStorage["CheckNumber"];
+            var Cnumber = localStorage["InventoryCheckNumber"];
+            tmp += "<tr><th>מקט החומר</th><th>סוג ייצור</th><th>הפער בספירה</th></tr>";
             for (var i = 0; i < MaterialList.length; i++) {
-
+             
                 if ((MaterialList[i].InventoryAmount - MaterialList[i].CheckAmount) != 0) {
                     // בתנאי השני אמור לבוא מספר ההוצאה- אבל בגלל שיש שגיאה שמתי כרגע מספר
-                    if (MaterialList[i].CheckNumber == 20) {
+                    if (MaterialList[i].CheckNumber == Cnumber) {
                         tmp += "<tr><td >" + MaterialList[i].MaterialId + "</td>";
                         tmp += "<td >" + MaterialList[i].ProductionId + "</td>";
                         PN = (MaterialList[i].CheckAmount) - (MaterialList[i].InventoryAmount);
@@ -276,15 +319,15 @@
             SUMstr += "<select id='makatid' required> <option value=''>בחר מקט</option>";
 
             t = 0;
-            for (var j = 0; j < MaterialList.length; j++) {
+            for (var j = 0; j < Checkmaterial.length; j++) {
                 var check = 0;
                 for (var i = 0; i < j; i++) {
-                    if (MaterialList[j].MaterialId == MaterialList[i].MaterialId) {
+                    if (Checkmaterial[j].MaterialId == Checkmaterial[i].MaterialId) {
                         check = 1;
                     }
                 }
                 if (check == 0) {
-                    SUMstr += "<option value='" + MaterialList[j].MaterialId + "'>" + MaterialList[j].MaterialId + "</option>";
+                    SUMstr += "<option value='" + Checkmaterial[j].MaterialId + "'>" + Checkmaterial[j].MaterialId + "</option>";
                 }
 
 
@@ -297,6 +340,7 @@
 
             document.getElementById("sumDiv").innerHTML = SUMstr;
         }
+
 
         function ShowSum() {
             show = ($("#makatid").val());
@@ -336,7 +380,12 @@
 
 
         function menufun() {
-            location.replace("Menu.html"); /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+            let rolenum = localStorage["RoleNum"];
+            if (rolenum == 10) //הוא מנהל
+                location.replace("Menu - manager.html");
+            else
+                location.replace("Menu.html");
+                    /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
         }
     </script>
 
@@ -352,9 +401,9 @@
                 <form id="Mform" >
                     <div><br /> <label for="RM">הזן מספר ספירת מלאי</label></div>
                     <div>
-                        <input type="text" id="NCI" name="NCI" required>
+                        <input type="date" id="NCI" name="NCI" required>
                     </div>
-                    <input id="SubBTN" class="btn" type="submit" value="בדיקת מספר">
+                    <input id="SubBTN" class="btn" type="submit" value="בדיקת תאריך">
                 </form>
                 <h4 id="Ccheck">בודק ספירת מלאי שמספרה </h4>
                 <div id="Certificate"></div>
@@ -372,6 +421,7 @@
         </div>
     <!--דיב של הדאטה טייבל של המנהל-->
         <div id="MTableDiv">
+            <input type="button" class="btn" id="menu" onclick="menufun()" value="חזרה לתפריט" />
             <h2>הצגת ספירת מלאי </h2>
             
             <div class="container">
@@ -405,10 +455,11 @@
                 </div>
 
                 <div id="reportDiv">
+                    <br />
                     <table align='center' id='reporttable'>
                        
                     </table>
-                </div>
+                </div=>
                 <div id="sumDiv"></div>
 
                 <div id="editDiv">
@@ -453,7 +504,7 @@
             </div>
 
         </div>
-        <input type="button" class="btn" id="menu" onclick="menufun()" value="חזרה לתפריט" />
+        
 
 </body>
 </html>

@@ -31,6 +31,17 @@ namespace FinalProject.Controllers
             //return null;
         }
 
+        [HttpGet]
+        [Route("api/InventoryCheckController/checknumber")]
+        public List<InvCheck> Get(string ChackDate)
+        {
+            InvCheck DN = new InvCheck();
+            return DN.ReadNumber(ChackDate);
+        }
+       
+
+
+
         ////[HttpGet]
         //[Route("api/InventoryCheckController/CheckNewCount")]
         //public List<InvCheck> MinvCheck()
@@ -41,7 +52,7 @@ namespace FinalProject.Controllers
         //}
 
 
-        [HttpPost]
+        [HttpPut]
         [Route("api/InventoryCheck/InsertNewCheck")] //הכנסת סוג חומר(מס הוצאה,מקט פנימי וכמות)
         public int postNewCheck([FromBody]InvCheck NewICheck)
         {
@@ -49,7 +60,7 @@ namespace FinalProject.Controllers
             return c.insert(NewICheck);
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("api/InventoryCheck/InsertCheckDetalis")] //הכנסת פרטי הוצאה לפי מספר הוצאה שקיבלנו מפוסט קודם
         // לפי - מספר ספירה, מקט, מחלקה וכמות
         public void postdetailsCheck([FromBody]InvDetails detailsC)

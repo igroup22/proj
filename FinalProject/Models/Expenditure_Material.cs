@@ -19,6 +19,7 @@ namespace FinalProject.Models
             this.amount = amount;
         }
 
+
         public int ExpenditureNum { get => expenditureNum; set => expenditureNum = value; }
         public string NumMaterial { get => numMaterial; set => numMaterial = value; }
         public int Amount { get => amount; set => amount = value; }
@@ -34,5 +35,10 @@ namespace FinalProject.Models
             dBservices.InsertMExpenditureToDB(MExpenditure);
 
         }
+        public List<Expenditure_Material> returnExM(string mispar)
+        {
+            DBservices db = new DBservices();
+            return db.returnExM(mispar);
+        }
     }
-    }
+}

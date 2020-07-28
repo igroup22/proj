@@ -160,8 +160,10 @@
     <Compile Include="Controllers\ExpenditureProductsController.cs" />
     <Compile Include="Controllers\InventoryCheckController.cs" />
     <Compile Include="Controllers\InventoryController.cs" />
+    <Compile Include="Controllers\MaterialController.cs" />
     <Compile Include="Controllers\ShippingCertificatesController.cs" />
     <Compile Include="Controllers\ShippingReceivedController.cs" />
+    <Compile Include="Controllers\ZoneController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -182,6 +184,7 @@
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\ShippingCertificates.cs" />
     <Compile Include="Models\ShippingReceived.cs" />
+    <Compile Include="Models\Zone.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -193,6 +196,8 @@
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="Pages\Algoritem.html" />
+    <Content Include="Pages\algorithm.PNG" />
     <Content Include="Pages\ExpenditureProducts.html" />
     <Content Include="Pages\img2.PNG" />
     <Content Include="Pages\Inventorycheck.html" />
@@ -209,6 +214,7 @@
     <Content Include="Pages\backg.png" />
     <Content Include="Pages\utils.js" />
     <Content Include="Pages\ManagerPage.html" />
+    <Content Include="Pages\צילום מחסן.PNG" />
     <Content Include="Scripts\ajaxCalls.js" />
     <Content Include="Scripts\ajaxCallsStub.js" />
     <Content Include="Scripts\bootstrap.js" />

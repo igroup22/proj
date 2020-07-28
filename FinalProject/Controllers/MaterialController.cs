@@ -7,19 +7,16 @@ using System.Web.Http;
 using FinalProject.Models;
 namespace FinalProject.Controllers
 {
-    public class ExpenditureController : ApiController
+    public class MaterialController : ApiController
     {
         // GET api/<controller>
-        public List<Expenditure> Get()
-        {
-            Expenditure expenditure = new Expenditure();
-            return expenditure.returnExpenditure();
-        }
+    
 
         // GET api/<controller>/5
-        public string Get(int id)
+        public List<Material> Get()
         {
-            return "value";
+            Material mt = new Material();
+            return mt.Read();
         }
 
         // POST api/<controller>

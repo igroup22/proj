@@ -30,6 +30,11 @@ namespace FinalProject.Models
             this.employeeNum = employeeNum;
         }
 
+        public List<InvCheck> ReadNumber( string datenum)
+        {
+            DBservices db = new DBservices();
+            return db.ReadNumber(datenum);
+        }
 
         public int insert(InvCheck Icheck)
         {

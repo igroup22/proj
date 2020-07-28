@@ -21,13 +21,15 @@
 
     <link href="style.css" rel="stylesheet" />
     <script>
-
-
+        temp = [];
+        counter = 0;
         function errGet(err) { console.log(err) }
         $(document).ready(function () {
+
             //inventory עושה קישור מותאם לתפריט לפי תפקיד ומביאה את המלאי מטבלת
             Inventoryfun();
             mode = "";
+            arrmatiral = "";
 
             $("#cancelSaveBTN").on("click", function () {
                 $("#editDiv").hide();
@@ -92,10 +94,12 @@
             return Certificatematerial;
         }
         //מקבל את התעודות משלוח ומכניס לדאטה טייבל
+        arrCertificate = [];
         function succGet(materialData) {
-
+            arrCertificate = materialData;
             btnlist = [];
             material = materialData;
+            console.log(materialData);
             Certificatematerial = Certificatecheck(material);
             try {
                 tbl = $('#materialsTable').DataTable({
@@ -256,12 +260,17 @@
 
             // add/edit a new Material record to the server
             if (mode == "edit") {
+
                 ajaxCall("PUT", "../api/Inventory", JSON.stringify(materialtoSave2), InventorySuccess, error);
                 ajaxCall("PUT", "../api/ShippingReceived", JSON.stringify(materialtoSave1), updateSuccess, error);
             }
             else if (mode == "new")
                 ajaxCall("POST", "../api/ShippingReceived", JSON.stringify(materialtoSave1), insertSuccess, error);
             return false;
+
+
+
+
         }
         //מחזיר את הכמות במלאי של חומר מסוג ייצור
         function getinv() {
@@ -284,6 +293,17 @@
 
         }
         function succGet1(materialData) {
+            arrCertificate = Certificatecheck(materialData);
+            //נרצה לעדכן את האלגוריתם-עשינו עדכון לשורה שאישרנו
+            //-----------------------------------------------------------------
+            //מקום אפשרי להכנסה מבחינת : איזור במצב 4 לא בשימוש.
+            ///מערך שמכיל רשומות של סחורה שהגיע materialData
+            j = 0;
+            saman = 0;
+
+
+            ajaxCall("GET", "../api/Zone", "", succGet4, errGet)
+
 
             tbl.clear();
             Certificatematerial = Certificatecheck(materialData);
@@ -301,6 +321,121 @@
 
         }
 
+        function succGet4(data) {
+            j = 0;
+            arrzone = data;
+            temp = [];
+            check = 0;
+        
+            //בדיקה ראשונה של תנאים הכרחיים
+            for (var i = 0; i < arrzone.length; i++) {
+                saman = 0;
+                if (arrzone[i].Area == 4) {
+                    saman++;
+                    for (var v = 0; v < arrmatiral.length; v++) {//עובר על טבלת חומרים
+                        if (arrmatiral[v].NumMaterial == arrCertificate[counter].NumMaterial) {
+
+                            if (arrzone[i].MClassification == arrmatiral[v].MaterialClassification) {
+                                saman++;
+                                check++;
+
+                            }
+                            break; //אם מצאנו את החומר אין צורך להמשיך לרוץ הכייש רק פעם אחת את החומר בטבלת חומרים
+                        }
+                    }
+                }
+                {
+                    /// בדיקות שניות לפי מיקום :על מערך זמני שמכיל את המיקומים הרלוונטיים.
+                    //if (saman == 3) {
+                    //    for (var q = 0; q < temp.length; q++) {
+                    //        for (var a = 0; arrzone.length; a++) {
+                    //            //בדיקת ציר X
+                    //            //שמתי כרגע מינוס אחד למרות שבפועל יהיה צריך לשים מינוס המרחק באיקס בין קוביה לקוביה
+                    //            //בדיקה האם קוביה מאחד הצדדים של הקוביה האחפשרית מכילה את הסוג יצור של החומר שאותו אני ארצה להכניס
+                    //            if ((temp[q].X + 1 == arrzone[a].X && arrCertificate[counter].productionID == arrzone[a].ProductionID) || (temp[q].X - 1 == arrzone[a].X && arrCertificate[counter].productionID == arrzone[a].ProductionID))
+                    //                saman++;
+                    //            //שמתי כרגע מינוס אחד למרות שבפועל יהיה צריך לשים מינוס המרחק באיקס בין קוביה לקוביה
+                    //            //בדיקה האם קוביה מאחד הצדדים של הקוביה האפשרית מכילה את אותו חומר כמו זה שאני רוצה להכניס
+                    //            if ((temp[q].X + 1 == arrzone[a].X && arrCertificate[counter].NumMaterial == arrzone[a].Id) || (temp[q].X - 1 == arrzone[a].X && arrCertificate[counter].NumMaterial == arrzone[a].Id))
+                    //                saman++;
+
+                    //        }
+                    //        //בדיקת ציר y
+
+                    //        //בדיקה האם קוביה מאחד הצדדים של הקוביה האפשרית מכילה את הסוג יצור של החומר שאותו אני ארצה להכניס
+                    //        if ((temp[q].Y + 1 == arrzone[a].Y && arrCertificate[counter].productionID == arrzone[a].ProductionID) || (temp[q].Y - 1 == arrzone[a].Y && arrCertificate[counter].productionID == arrzone[a].ProductionID))
+                    //            saman++;
+                    //        //שמתי כרגע מינוס אחד למרות שבפועל יהיה צריך לשים מינוס המרחק באיקס בין קוביה לקוביה
+                    //        //בדיקה האם קוביה מאחד הצדדים של הקוביה האפשרית מכילה את אותו חומר כמו זה שאני רוצה להכניס
+                    //        if ((temp[q].Y + 1 == arrzone[a].Y && arrCertificate[counter].NumMaterial == arrzone[a].Id) || (temp[q].Y - 1 == arrzone[a].Y && arrCertificate[counter].NumMaterial == arrzone[a].Id))
+                    //            saman++;
+                    //    }
+                    //}
+                }
+                ////הכנסת החומר לתוך הקוביה במערך הזון
+                if (saman >= 2) {
+                    //    arrzone[i].area = 3;
+                    //    arrzone[i].Production = arrCertificate.productionID;
+                    //}
+                    d = new Date().getDate();
+                    m = new Date().getMonth() + 1; //פונקציה שמתחילה מ0-ינואר
+                    y = new Date().getFullYear();
+
+                    t = {
+                        "Area": 3,
+                        "MClassification": arrzone[i].MClassification,
+                        "Production": arrCertificate[counter].ProductionID,
+                        "AmountN": arrzone[i].AmountN,
+                        "X": arrzone[i].X,
+                        "Y": arrzone[i].Y,
+                        "Z": arrzone[i].Z,
+                        "ID": arrCertificate[counter].NumMaterial,
+                        "ExpenditureDate": d + "/" + m + "/" + y, //תאריך ושעה נוכחיים
+                    }
+
+                    temp[j] = t;
+                    j++;
+                    {
+                        //console.log(temp);
+                        ///במקרה שמערך נשאר ריק כי אין איזור שעומד בכל התנאים נצטרך או לוותר על תנאי או למצוא פתרון למלאי שאין לו מקום
+                        ///איך מכניסים כמות של חומר
+                        ///במערך הזמני יש לי מספר מיקומים אפשריים איך נתעדף?
+                        ///   amountN להכניס בדאטה בצורה של מספרים שיהיה התאמה לטבלה של חומר
+                        /// את הבדיקות נחלק לשני שלבים בדיקות חובה ואז בדיקות מיקום:id,סוג ייצור
+                    }
+                }
+            }
+         
+            for (var m = 0; m < arrCertificate[counter].AmountReceived; m++) {
+
+                for (var x = 0; x < temp.length; x++) { /*מעדכן את הדאטה בייס את טבלת ZONE*/
+                    if (temp[x] != 1) {
+
+                        ajaxCall("PUT", "../api/Zone", JSON.stringify(temp[x]), updateSuccess1234, error1234);
+                        temp[x] = 1;
+                        break;
+                    }
+                }
+
+            }
+
+            counter++;
+
+            if (counter >= arrCertificate.length) {
+                counter = 0;
+            }
+        }
+
+        function updateSuccess1234(data) {
+            console.log(data);
+        }
+        function error1234(err) { console.log(err); }
+
+        //-----------------------------------------------------------------
+
+
+
+        //--------------------------------------------------------------
         // success callback function after update
         function insertSuccess(materialData) {
             $("#pForm").show();
@@ -323,6 +458,40 @@
             swal("Error: " + err);
         }
 
+
+        //בדיקות של אלגוריתם
+
+        //נשמור את מערך של החומרים
+        ajaxCall("GET", "../api/Material", "", succGet3, errGet)
+
+        function succGet3(data) {
+            console.log(data);
+            arrmatiral = data;
+        }
+        function errGet(errGet) { console.log(errGet); }
+
+
+        //string area;
+        //string mClassification;
+        //string production;
+        //string amountN;
+        //int x;
+        //int y;
+        //int z;
+        //string iD;
+        //string expenditureDate;
+        //area - =4איזור :מת=1/מעבר=2/בשימוש=3/לא בשימוש
+        //MaterialClassification- =סוג בסיסי א=/ חומצי ב=/ דליק =ג/ נטרלי ד
+        //productionType- סוג ייצור 15 17
+        //AmountName-צורת אחסון -> גריקן/קוביה/אבקה/שק/חבית
+        //x
+        //y
+        //z
+        //ID - מקט
+        //Date - תאריך
+        function algo() {
+            window.location.href = "Algoritem.html";
+        }
     </script>
 </head>
 
@@ -333,10 +502,8 @@
                 <div id="menuPage" class="navbar-brand"></div>
                 <div id="Expendit" class="navbar-brand"></div>
                 <div id="Invent" class="navbar-brand"></div>
-                <a href="ShippingReceived.html" class="navbar-brand"> טבלת חומרים להכנסה</a>
-
+                <!--<div> <a href="ShippingReceived.html" class="navbar-brand"> טבלת חומרים להכנסה</a> </div>-->
                 <!--<input type="button" onclick="menufun()" class="navbar-brand" value="חזרה לתפריט" />-->
-
 
             </div>
             <!--<a href="Menu.html" id="MenuReturn" class="navbar-brand">חזרה לתפריט</a>-->
@@ -397,12 +564,14 @@
                 </div>
 
 
-                <button type="submit" class="btn btn-primary btn-lg" id="saveBTN">שמור</button>
-                <input type="button" class="btn btn-warning btn-lg" id="cancelSaveBTN" value="ביטול" />
+                <button type="submit" class=" btn-primary btn-lg" id="saveBTN">שמור</button>
+                <input type="button" class=" btn-warning btn-lg" id="cancelSaveBTN" value="ביטול" />
             </form>
+
         </div>
 
     </div>
+    <input type="button" class="algo" onclick="algo()" id="algo" value="צפה במחסן" />
     <div class="semel">
         <img src="semel.svg.png" />
     </div>

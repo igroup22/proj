@@ -1,0 +1,618 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="style.css" rel="stylesheet" />
+    <style type="text/css">
+        #container {
+            /*background-image: url('algorithm.PNG');*/
+            padding-top: 7.5px;
+            padding-left: 2.5px;
+        }
+   #btnalgo a{
+    text-align: center;
+    color:black;
+    /*opacity: 0.7;*/
+    /*width: 100px;
+    height: 25px;*/
+    font-family: 'Segoe UI';
+    margin: 5px;
+    /*border: 1px solid black;*/
+    margin-top: 25px;
+    border: 1px solid black;
+
+}
+       #btnalgo a:hover {
+        background-color: darkgrey;
+        color: white;
+    }
+   .bbb{
+       margin-left:130px;
+   }
+
+
+        #aaa1 {
+            margin-top: 450px;
+            margin-left: 15px;
+            position: absolute;
+        }
+
+        img {
+            height: 430px;
+            width: 850px;
+        }
+
+        #aaa {
+            padding-top: 100px;
+            padding-left: 150px;
+        }
+        #menuBTN {
+            background-color: lightgrey;
+            border-radius: 4px;
+            text-align: center;
+            transition-duration: 0.4s;
+            border: 1px solid black;
+            margin-top: 20px;
+            margin-right: 5px;
+            font-family: 'Segoe UI';
+        }
+            #menuBTN:hover {
+                background-color: darkgrey;
+                color: white;
+                    font-family: 'Segoe UI';
+            }
+        
+        tr, td {
+            border: 1px solid black;
+            width: 30px;
+             font-family: 'Segoe UI';
+        }
+        body {
+            display: flex;
+ 
+        }
+    </style>
+
+</head>
+<body>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css">
+
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="../Scripts/ajaxCalls.js"></script>
+
+
+
+
+
+
+    <script>
+        //area - =4איזור :מת=1/מעבר=2/בשימוש=3/לא בשימוש
+        //MaterialClassification- =סוג בסיסי א=/ חומצי ב=/ דליק =ג/ נטרלי ד
+        //productionType- סוג ייצור 15 17
+        //AmountName-צורת אחסון -> גריקן/קוביה/אבקה/שק/חבית
+        //x
+        //y
+        //z
+        //ID - מקט
+        //Date - תאריך
+        arrzone = [];
+
+        $(document).ready(function () {
+            ajaxCall("GET", "../api/Zone", "", succGet, errGet)
+        });
+
+        function loadStorage() {
+
+        }
+
+
+        function succGet(data) {
+            console.log(data)
+            arrzone = data;
+            str = '';
+            counter = 0;
+
+            // אתחול פיקסלים ראשוני - פינה שמאלית נמוכה
+            pxl1 = 15;
+            pxt2 = 415;
+            pxl3 = 25;
+            pxt4 = 395;
+
+            temp = 1;
+
+            for (var z = 0; z < 3; z++) {
+
+                x = arrzone[z].X;
+                y = arrzone[z].Y;
+
+
+
+
+                if (arrzone[z].Area == 4 || arrzone[z].Area == 3) {
+                    str += '<area shape="rect" coords="' + pxl1 + ',' + pxt2 + ',' + pxl3 + ',' + pxt4 + '" alt="algo" href="#" onmouseover="check()">'
+                    pxl1 += 10;
+                    pxl3 += 10;
+                }
+                counter++;
+
+
+                str += 'x - ' + x + '  y - ' + y;
+                //str += '<area shape="rect" coords="15,415,25,395" alt="algo" href="#" onmouseover="check()">'
+
+
+                if (arrzone[z].X == 80) {
+
+                    pxl1 = 15;
+                    pxt2 = 415 - 20 * temp;
+                    pxl3 = 25;
+                    pxt4 = 395 - 20 * temp;;
+
+
+
+                    temp += 1;
+                    //pxl1 = 15 * temp;
+                    //pxt2 -= 20;
+                    //pxl3 = 25;
+                    //pxt4 -= 20;
+                }
+
+
+            }
+            //document.getElementById("aaa").innerHTML = str;
+
+        }
+        function errGet(err) {
+            console.log(err)
+        }
+        //    //for (var a = 0; data.length; a++) {
+
+        //    //    }
+        //    }
+        //function errGet(arr) { console.log(arr) }
+        str1 = "";
+        function check(area) {
+
+            console.log(area.id);
+            console.log(arrzone.length);
+            if (area.id == "a1") {
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 0 && arrzone[i].Y > 16 && arrzone[i].X < 6 && arrzone[i].Y < 19) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+
+                            if (count1 == 5) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 5) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production +  "</td>";
+                            count1++;
+
+                        }
+                    }
+
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+            if (area.id == "a2") {
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 5 && arrzone[i].Y > 16 && arrzone[i].X < 56 && arrzone[i].Y < 19) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+            if (area.id == "a3") {
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 0 && arrzone[i].Y > 9 && arrzone[i].X < 56 && arrzone[i].Y < 12) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+
+            }
+            if (area.id == "a4") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 65 && arrzone[i].Y > 10 && arrzone[i].X < 81 && arrzone[i].Y < 21) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+
+            }
+            if (area.id == "a5") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 55 && arrzone[i].Y > 18 && arrzone[i].X < 66 && arrzone[i].Y < 21) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+
+            }
+            if (area.id == "a6") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 0 && arrzone[i].Y > 7 && arrzone[i].X < 51 && arrzone[i].Y < 10) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+
+            }
+            if (area.id == "a7") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 0 && arrzone[i].Y > 0 && arrzone[i].X < 26 && arrzone[i].Y < 3) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+            if (area.id == "a8") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 30 && arrzone[i].Y > 0 && arrzone[i].X < 51 && arrzone[i].Y < 3) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+            if (area.id == "a9") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 50 && arrzone[i].Y > 7 && arrzone[i].X < 66 && arrzone[i].Y < 10) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+            if (area.id == "a10") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 50 && arrzone[i].Y > 0 && arrzone[i].X < 66 && arrzone[i].Y < 3) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+            if (area.id == "a11") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 75 && arrzone[i].Y > 1 && arrzone[i].X < 81 && arrzone[i].Y < 4) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+            if (area.id == "a12") {
+
+                str1 = "";
+                str1 = "<table ><tr>";
+                count1 = 0;
+                for (var i = 0; i < arrzone.length; i++) {
+                    if (arrzone[i].X > 75 && arrzone[i].Y > 3 && arrzone[i].X < 81 && arrzone[i].Y < 10) {
+                        if (arrzone[i].ID == 11111 || arrzone[i].ID == "" || arrzone[i].ID == null) {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='empty'>  פנוי </td> ";
+                            count1++;
+                        }
+
+                        else {
+                            if (count1 == 10) {
+                                str1 += "</tr><tr>";
+                                count1 = 0;
+                            }
+                            str1 += " <td class='full'>" + "מקט" + "   " + arrzone[i].ID + "   " + " סוג ייצור" + "   " + arrzone[i].Production + "</td>";
+                            count1++;
+
+                        }
+                    }
+                }
+                str1 += "</tr></table >";
+                document.getElementById("aaa1").innerHTML = str1;
+            }
+        }
+
+
+        function menufun() {
+
+            let rolenum = localStorage["RoleNum"];
+            if (rolenum == 10) //הוא מנהל
+                location.replace("Menu - manager.html");
+            else
+                location.replace("Menu.html");
+
+            /*מעבר לדף אחר שמציג את הטבלאות שהוא רואה*/
+        }
+
+
+/**/</script>
+
+    <map name="workmap" id="workmap">
+        <!--מחמצנים-->
+        <area shape="rect" coords="15,100,87,155" alt="algo" onclick="check(this)" href="#" id="a1">
+        <!--כללי אבקות עליון-->
+        <area shape="rect" coords="94,100,540,155" alt="algo" href="#" onclick="check(this)" id="a2">
+        <!--בסיסים-->
+        <area shape="rect" coords="15,205,515,265" alt="algo" href="#" onclick="check(this)" id="a3">
+        <!--חומצי גדול-->
+        <area shape="rect" coords="617,15,835,185" alt="algo" href="#" onclick="check(this)" id="a4">
+        <!--חומצי קטן-->
+        <area shape="rect" coords="535,15,617,92" alt="algo" href="#" onclick="check(this)" id="a5">
+        <!--כללי אבקות אמצע-->
+        <area shape="rect" coords="15,272,465,320" alt="algo" href="#" onclick="check(this)" id="a6">
+        <!--כללי אבקות תחתון - שמאל-->
+        <area shape="rect" coords="15,370,265,415" alt="algo" href="#" onclick="check(this)" id="a7">
+        <!--כללי אבקות תחתון - ימין-->
+        <area shape="rect" coords="312,370,465,415" alt="algo" href="#" onclick="check(this)" id="a8">
+        <!--כללי אבקות מקבילים - עליון-->
+        <area shape="rect" coords="473,277,630,323" alt="algo" href="#" onclick="check(this)" id="a9">
+        <!--כללי אבקות מקבילים- תחתון-->
+        <area shape="rect" coords="478,370,632,415" alt="algo" href="#" onclick="check(this)" id="a10">
+        <!--כללי אבקות ימני קיצוני-->
+        <area shape="rect" coords="752,340,835,390" alt="algo" href="#" onclick="check(this)" id="a11">
+        <!--דליקים-->
+        <area shape="rect" coords="752,235,835,330" alt="algo" href="#" onclick="check(this)" id="a12">
+    </map>
+
+
+    <div id="container">
+        <img src="algorithm.PNG" alt="Workplace" usemap="#workmap" width="830" height="430">
+    </div>
+    <!--<br />
+    <div id="aaa"></div>-->
+    <br />
+
+    <div id="aaa1"></div>
+   
+    <div class="bbb" id="btnalgo">
+        <!--<input type="button" class="btn" id="menu" onclick="menufun()" value="לתפריט" />
+        <a href='Menu.html' class='btn'>לתפריט</a>-->
+        <input type="button" class="btn" id="menuBTN" onclick="menufun()" value="לתפריט" />
+        <a href="ExpenditureProducts.html" class="btn">הוצאת סחורה</a>
+        <a href="Receiving materials LogIn.html" class="btn">קבלת סחורה</a>
+    </div>
+
+</body>
+</html>

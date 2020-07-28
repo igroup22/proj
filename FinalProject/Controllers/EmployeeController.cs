@@ -11,13 +11,15 @@ namespace FinalProject.Controllers
     public class EmployeeController : ApiController
     {
         // GET api/<controller>
-        //[HttpGet]
-        //[Route("api/Employee/employeeNum")]
-        public Employee Get(string employeeNum)
+        [HttpGet]
+        [Route("api/Employee/getemployee")]
+        public List<Employee> Get(string EmployeeNum, string UserPassword)
         {
             Employee em = new Employee();
-            return em.getemployee(employeeNum);
+            return em.getemployee(EmployeeNum, UserPassword);
         }
+
+
 
         //public List<Employee> Get()
         //{
